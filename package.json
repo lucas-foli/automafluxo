@@ -1,0 +1,13 @@
+{
+  "name": "automafluxo",
+  "version": "1.0.0",
+  "description": "Automafluxo project",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "marked": "^4.3.0"
+  },
+  "author": "Your Name",
+  "license": "ISC"
+}
