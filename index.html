@@ -20,6 +20,31 @@
 </head>
 
 <body>
+    <!-- Load the JS SDK asynchronously -->
+    <div id="fb-root"></div>
+
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '2018451921986469',
+                cookie: true,
+                xfbml: true,
+                version: 'v22.0'
+            });
+
+            FB.AppEvents.logPageView();
+
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
     <div class="logo-container">
         <img src="./assets/logo.jpg" alt="Logo">
     </div>
@@ -28,17 +53,13 @@
     <p><a href="termos.html">Termos de Serviço</a> | <a href="politica.html">Política de Privacidade</a></p>
     <!-- The JS SDK Login Button -->
 
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+    <fb:login-button configId="1861567134613057" onlogin="checkLoginState();">
     </fb:login-button>
 
     <div id="status">
     </div>
 
-    <!-- Load the JS SDK asynchronously -->
-    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous"
-        src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v22.0&appId=2018451921986469"></script>
+
 </body>
 
 </html>
