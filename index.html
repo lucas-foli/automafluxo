@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="fb:app_id" content="2018451921986469" />
     <meta property="og:site_name" content="Automações Átrio - Automafluxo" />
+    <meta property="fb:app_id" content="2018451921986469" />
     <meta property="og:title" content="Automafluxo - Automação para WhatsApp e Instagram" />
     <meta property="og:description"
         content="Oferecemos soluções de automação para impulsionar seu atendimento e vendas." />
@@ -15,27 +15,7 @@
     <meta property="og:image" content="https://www.automafluxo.com.br/assets/logo.jpg" />
     <title>Bem-vindo</title>
     <link rel="stylesheet" href="styles.css">
-
-    <script>
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '2018451921986469',
-                cookie: true,
-                xfbml: true,
-                version: 'v22.0'
-            });
-
-            FB.AppEvents.logPageView();
-
-        };
-
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) { return; }
-            js = d.createElement(s); js.id = id;
-            js.src = "https://connect.facebook.net/en_US/sdk.js";
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
+    <script src="./public/fb-login.js">
     </script>
 </head>
 
