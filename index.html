@@ -20,20 +20,14 @@
 </head>
 
 <body>
-    <!-- Load the JS SDK asynchronously -->
-    <div id="fb-root"></div>
-
     <script>
         window.fbAsyncInit = function () {
             FB.init({
                 appId: '2018451921986469',
-                cookie: true,
                 xfbml: true,
                 version: 'v22.0'
             });
-
             FB.AppEvents.logPageView();
-
         };
 
         (function (d, s, id) {
@@ -51,6 +45,10 @@
     <h1>Bem-vindo ao nosso serviço de automação 🤖</h1>
     <p>Fornecemos soluções de automação utilizando APIs do Facebook, WhatsApp e Instagram.</p>
     <p><a href="termos.html">Termos de Serviço</a> | <a href="politica.html">Política de Privacidade</a></p>
+
+    <!-- Like Button -->
+    <div class="fb-like" data-share="true" data-width="450" data-show-faces="true">
+    </div>
     <!-- The JS SDK Login Button -->
 
     <fb:login-button configId="1861567134613057" onlogin="checkLoginState();">
