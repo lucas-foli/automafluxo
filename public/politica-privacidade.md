@@ -2,7 +2,7 @@
 
 ## 1. Introdução
 
-A Automafluxo valoriza sua privacidade e se compromete a proteger os dados pessoais de seus usuários. Esta Política de Privacidade explica como coletamos, usamos, compartilhamos e protegemos suas informações ao utilizar nossos serviços, incluindo aqueles que interagem com plataformas da Meta (Facebook, Instagram, WhatsApp, etc.).
+A Automafluxo valoriza sua privacidade e se compromete a proteger os dados pessoais de seus usuários. Esta Política de Privacidade explica como coletamos, usamos, compartilhamos e protegemos suas informações ao utilizar nossos serviços, incluindo aqueles que interagem com plataformas da Meta (Facebook, Instagram, WhatsApp, etc.). Utilizamos o app Automações Átrio para realizar nossos serviços
 
 ## 2. Dados Coletados
 
