@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Automafluxo project",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "node scripts/build.js"
   },
   "dependencies": {
     "crypto": "^1.0.1",
