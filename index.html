@@ -46,12 +46,11 @@
     <p>Fornecemos soluções de automação utilizando APIs do Facebook, WhatsApp e Instagram.</p>
     <p><a href="termos.html">Termos de Serviço</a> | <a href="politica.html">Política de Privacidade</a></p>
 
-    <!-- Like Button -->
-    <div class="fb-like" data-share="true" data-width="450" data-show-faces="true">
-    </div>
     <!-- The JS SDK Login Button -->
 
-    <fb:login-button configId="1861567134613057" onlogin="checkLoginState();">
+    <fb:login-button configId="1861567134613057" scope="public_profile,email,pages_show_list,instagram_business_basic,
+    instagram_business_manage_comments,
+    instagram_business_content_publish" onlogin="checkLoginState();">
     </fb:login-button>
 
     <div id="status">
