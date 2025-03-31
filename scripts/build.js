@@ -4,7 +4,7 @@ const path = require('path');
 // Load env vars
 require('dotenv').config();
 
-const templatePath = path.join(__dirname, '../public/fb-login.template.js');
+const templatePath = path.join(__dirname, '../public/fb-login.js');
 const outputPath = path.join(__dirname, '../dist/fb-login.js');
 
 // Read template file with placeholders
