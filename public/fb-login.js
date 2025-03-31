@@ -58,7 +58,20 @@ function getBusinessAccount() {
 function saveUserToDatabase({ fbUserId, name }) {
     localStorage.setItem('fb-creds', { id: fbUserId, name })
 }
-  
+
 function updateUserInstagramId({ fbUserId, name }) {
     saveUserToDatabase({ fbUserId, name })
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const instagramLoginButton = document.getElementById('instagram-login');
+
+    if (instagramLoginButton) {
+        instagramLoginButton.addEventListener('click', function () {
+            console.log('Instagram login button clicked');
+            window.location.href = 'https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=1138546020791182&redirect_uri=https://automafluxo.com.br/&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights';
+        });
+    } else {
+        console.error('Instagram login button not found in the DOM');
+    }
+});
