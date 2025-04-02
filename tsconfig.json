@@ -1,7 +1,0 @@
-{
-    "compilerOptions": {
-      "outDir": "./public",
-      "target": "ES6",
-      "module": "ES6"
-    }
-}
