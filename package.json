@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Automafluxo project",
   "scripts": {
-    "start": "dotenvx run -- nodemon app.js",
+    "start": "npm run build && dotenvx run -- nodemon app.js",
     "build": "node scripts/build.js"
   },
   "dependencies": {

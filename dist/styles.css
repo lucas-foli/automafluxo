@@ -1,0 +1,94 @@
+body {
+    background-size: cover;
+    background-position: 100%;
+    background-repeat: no-repeat;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #d1cece;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+    background-image: url('/assets/image1.png');
+    text-align: center;
+    font-family: Arial, sans-serif;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px;
+    padding: 20px;
+    max-width: 100%;
+    line-height: 1.6;
+}
+
+h1,
+h2 {
+    color: #ffffff;
+}
+
+section {
+    margin-bottom: 20px;
+}
+
+footer {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.logo-container {
+    z-index: 100px;
+}
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 10px 10px 10px rgba(2, 46, 118, 0.5);
+}
+
+p {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    text-shadow: 10px 10px 10px rgba(2, 46, 118, 0.5);
+    text-align: center;
+}
+
+a {
+    color: #FFD700;
+    font-weight: bold;
+    text-decoration: none;
+    text-shadow: 10px 10px 10px rgba(2, 46, 118, 0.5);
+}
+
+.scrollable-content {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.overlay {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    /* Ajuste a opacidade aqui */
+    z-index: -1;
+}

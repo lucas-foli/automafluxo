@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('@dotenvx/dotenvx').config();
 const express = require("express");
 const path = require("path");
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -56,11 +56,11 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/politica", (_req, res) => {
-  res.sendFile(path.join(__dirname, "politica.html"));
+  res.sendFile(path.join(__dirname, "/public/politica.html"));
 });
 
 app.get("/termos", (_req, res) => {
-  res.sendFile(path.join(__dirname, "termos.html"));
+  res.sendFile(path.join(__dirname, "/public/termos.html"));
 });
 
 const PORT = process.env.PORT || 3000;
