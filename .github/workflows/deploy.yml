@@ -27,9 +27,10 @@ jobs:
 
       - name: Inject env vars into JS
         run: |
-          sed -i "s|__INSTAGRAM_CLIENT_ID__|${{ secrets.INSTAGRAM_CLIENT_ID }}|g" public/fb-login.js
-          sed -i "s|__INSTAGRAM_CLIENT_SECRET__|${{ secrets.INSTAGRAM_CLIENT_SECRET }}|g" public/fb-login.js
-          sed -i "s|__INSTAGRAM_REDIRECT_URI__|${{ secrets.INSTAGRAM_REDIRECT_URI }}|g" public/fb-login.js
+          sed -i "s|__INSTAGRAM_CLIENT_ID__|${{ secrets.INSTAGRAM_CLIENT_ID }}|g" app.js
+          sed -i "s|__INSTAGRAM_CLIENT_SECRET__|${{ secrets.INSTAGRAM_CLIENT_SECRET }}|g" app.js
+          sed -i "s|__INSTAGRAM_REDIRECT_URI__|${{ secrets.INSTAGRAM_REDIRECT_URI }}|g" app.js
+          sed -i "s|__MONGODB_URI__|${{ secrets.MONGODB_URI }}|g" app.js
 
       - name: Build
         run: npm run build
