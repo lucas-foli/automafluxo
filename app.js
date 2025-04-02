@@ -1,4 +1,3 @@
-require("@dotenvx/dotenvx").config();
 const express = require("express");
 const path = require("path");
 const { MongoClient, ServerApiVersion } = require("mongodb");

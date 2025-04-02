@@ -40,7 +40,7 @@ jobs:
     needs: build
     steps:
       - name: Report build status
-        run: echo "Build completed successfully."
+        run: echo "Build completed successfully. Read var "${{secrets.INSTAGRAM_REDIRECT_URI}}"
 
   deploy:
     runs-on: ubuntu-latest
