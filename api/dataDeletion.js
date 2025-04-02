@@ -6,9 +6,6 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-function deleteUserData(fbUserId) {
-    app.post()
-}
 
 /**
  * Função para decodificar strings em Base64 URL-safe

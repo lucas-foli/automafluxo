@@ -11,7 +11,7 @@ body {
     color: #d1cece;
     font-family: Arial, sans-serif;
     flex-direction: column;
-    background-image: url('./assets/image1.png');
+    background-image: url('/assets/image1.png');
     text-align: center;
     font-family: Arial, sans-serif;
     justify-content: space-around;
