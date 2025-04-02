@@ -10,12 +10,15 @@
     "@dotenvx/dotenvx": "^1.39.0",
     "axios": "^1.8.4",
     "crypto": "^1.0.1",
-    "express": "^4.21.2",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
     "marked": "^4.3.0",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.13.1",
-    "nodemon": "^3.1.9"
+    "mongoose": "^8.13.1"
   },
   "author": "Your Name",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
 }

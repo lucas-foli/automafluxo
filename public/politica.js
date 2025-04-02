@@ -1,7 +1,7 @@
 // Função para carregar a Política de Privacidade
 const carregarPolitica = async () => {
     try {
-        const response = await fetch('/public/politica-privacidade.md');
+        const response = await fetch('/politica-privacidade.md');
         if (!response.ok) throw new Error('Erro ao carregar o arquivo');
 
         const text = await response.text();

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const path = require("path");
 const { MongoClient, ServerApiVersion } = require("mongodb");
@@ -43,6 +44,7 @@ run().catch(console.dir);
 // Serve arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
+app.use(express.static(path.join(__dirname, 'dist')))
 
 // Monta as rotas da API
 app.use("/api/user", userRoutes);
