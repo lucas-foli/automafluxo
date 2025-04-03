@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "description": "Automafluxo project",
   "scripts": {
-    "start": "npm run build && dotenvx run -- nodemon app.js",
+    "start": "nodemon app.js",
     "build": "node scripts/build.js"
   },
   "dependencies": {
-    "@dotenvx/dotenvx": "^1.39.0",
     "axios": "^1.8.4",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
@@ -15,6 +14,10 @@
     "marked": "^4.3.0",
     "mongodb": "^6.15.0",
     "mongoose": "^8.13.1"
+  },
+  "engines": {
+    "node": "^22.13.0",
+    "npm": "^11.0.0"
   },
   "author": "Your Name",
   "license": "ISC",

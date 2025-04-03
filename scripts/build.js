@@ -1,9 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// Carrega as variáveis de ambiente
-require("@dotenvx/dotenvx").config();
-
 // Diretório de origem e destino
 const publicDir = path.join(__dirname, "../public");
 const distDir = path.join(__dirname, "../dist");
