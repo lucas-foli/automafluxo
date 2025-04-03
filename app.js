@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import cors from "cors";
 import express from "express";
 import path from "path";
 
@@ -14,6 +15,7 @@ const app = express();
 // Middlewares para processar JSON e dados de formulários
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {

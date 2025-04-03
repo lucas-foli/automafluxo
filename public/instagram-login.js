@@ -28,7 +28,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   instagramLoginButton.addEventListener("click", async () => {
     try {
-        await fetch('/api/instagram/initiate');
+        const url = await fetch('/api/instagram/initiate');
+        console.log(url)
     } catch (err) {
         console.error('Could not make request', err)
     }
