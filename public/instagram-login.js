@@ -26,14 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const instagramLoginButton = document.getElementById("instagram-login");
   const authorizeButton = document.getElementById("authorize");
 
-  instagramLoginButton.addEventListener("click", async () => {
-    try {
-        const url = await fetch('/api/instagram/initiate');
-        console.log(url)
-    } catch (err) {
-        console.error('Could not make request', err)
-    }
-  });
+  instagramLoginButton.addEventListener("click", () => window.location.href = '/api/instagram/initiate');
   authorizeButton.addEventListener("click", () => {
     const code = window.location.href.split("code=")[1].split("#_")[0];
     console.log("Authorize button clicked");
