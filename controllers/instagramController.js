@@ -4,6 +4,7 @@ dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
+const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 
 export const initiateInstagramFlow = async (req, res) => {
   console.log(INSTAGRAM_CLIENT_ID, INSTAGRAM_REDIRECT_URI);
@@ -15,4 +16,57 @@ export const initiateInstagramFlow = async (req, res) => {
     "&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.redirect(url);
+};
+
+export const getAccessToken = async (req, res) => {
+  const code = req.url.split("code=")[1];
+
+  // Cria os dados do formulário em formato URL encoded
+  const formData = new URLSearchParams();
+  formData.append("client_id", INSTAGRAM_CLIENT_ID);
+  formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
+  formData.append("grant_type", "authorization_code");
+  formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
+  formData.append("code", code);
+
+  try {
+    const response = await axios.post(
+      "https://api.instagram.com/oauth/access_token",
+      formData.toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    // Retorna os dados obtidos para o front-end
+    const data = res.json(response.data);
+    console.log("getAccessToken response", response.data);
+    getLongAccessToken(data);
+  } catch (error) {
+    console.error("Erro ao buscar o access token:", error);
+    const status = error.response ? error.response.status : 500;
+    res.status(status).json({ error: "Erro interno do servidor" });
+  }
+};
+
+export const getLongAccessToken = async (getTokenData) => {
+  try {
+    const url = `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${INSTAGRAM_CLIENT_SECRET}&access_token=${getTokenData.access_token}`;
+    const response = await axios.get(url);
+
+    const data = response.data;
+    console.log("getLongAccessToken data", data);
+    // Aqui você pode salvar os dados ou chamar saveUserToDatabase, etc.
+    // saveUserToDatabase({
+    //   fbUserId: data.userId || "userId",
+    //   name: "name",
+    //   token: data, // ou o token específico, conforme necessário
+    // });
+    res.status(200).json(data);
+    window.alert("User connected!");
+  } catch (error) {
+    console.error("Error fetching access token:", error);
+  }
 };

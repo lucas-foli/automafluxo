@@ -22,15 +22,14 @@ const saveUserToDatabase = async ({ fbUserId, name, token }) => {
   // .catch(err => console.error('Error saving user:', err));
 };
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const instagramLoginButton = document.getElementById("instagram-login");
   const authorizeButton = document.getElementById("authorize");
 
   instagramLoginButton.addEventListener("click", () => window.location.href = '/api/instagram/initiate');
   authorizeButton.addEventListener("click", () => {
     const code = window.location.href.split("code=")[1].split("#_")[0];
-    console.log("Authorize button clicked");
-    fetchInstagramAccessToken(code);
+    fetch(`/api/instagram/access-token?code=${code}`);
   });
 });
 
