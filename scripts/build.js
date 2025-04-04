@@ -1,13 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 
-// Limpa a pasta dist (se existir)
-fs.rmSync(distDir, { recursive: true, force: true });
-
 // Diretório de origem e destino
 const publicDir = path.join(__dirname, "../public");
 const distDir = path.join(__dirname, "../dist");
 
+// Limpa a pasta dist (se existir)
+fs.rmSync(distDir, { recursive: true, force: true });
 
 // Copia a pasta public para dist
 fs.cpSync(publicDir, distDir, { recursive: true });
@@ -47,4 +46,3 @@ const processDirectory = (dir) => {
 processDirectory(distDir);
 
 console.log("✅ Build completo, todos os arquivos foram processados.");
-console.dir(distDir)

@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  prepare:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,27 +25,24 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Inject env vars into JS
+      - name: Create .env file
         run: |
-          sed -i "s|__INSTAGRAM_CLIENT_ID__|${{ secrets.INSTAGRAM_CLIENT_ID }}|g" app.js
-          sed -i "s|__INSTAGRAM_CLIENT_SECRET__|${{ secrets.INSTAGRAM_CLIENT_SECRET }}|g" app.js
-          sed -i "s|__INSTAGRAM_REDIRECT_URI__|${{ secrets.INSTAGRAM_REDIRECT_URI }}|g" app.js
-          sed -i "s|__MONGODB_URI__|${{ secrets.MONGODB_URI }}|g" app.js
-
-      - name: Build
-        run: npm run build
+          echo "INSTAGRAM_CLIENT_ID=${{ secrets.INSTAGRAM_CLIENT_ID }}" >> .env
+          echo "INSTAGRAM_CLIENT_SECRET=${{ secrets.INSTAGRAM_CLIENT_SECRET }}" >> .env
+          echo "INSTAGRAM_REDIRECT_URI=${{ secrets.INSTAGRAM_REDIRECT_URI }}" >> .env
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env
 
   report-build-status:
     runs-on: ubuntu-latest
-    needs: build
+    needs: prepare
     steps:
       - name: Report build status
         run: echo "Build completed successfully."
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: prepare
     steps:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
