@@ -6,6 +6,23 @@ const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 
+router.post("/initiate", async (req, res) => {
+  const url =
+    "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +
+    process.env.INSTAGRAM_CLIENT_ID +
+    "&redirect_uri=" +
+    process.env.INSTAGRAM_REDIRECT_URI +
+    "&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
+  try {
+    await axios.get(url);
+    console.log('I worked');
+  } catch (error) {
+    const status = error.response ? error.response.status : 500;
+    res.status(status).json({ error: "Erro interno do servidor" });
+    console.error('Internal server error 🐣');
+  }
+});
+
 // Endpoint para buscar o access token do Instagram
 router.post("/", async (req, res) => {
   const { code } = req.body;

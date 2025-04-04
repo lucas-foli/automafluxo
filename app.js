@@ -1,18 +1,21 @@
-require('@dotenvx/dotenvx').config();
-const express = require("express");
-const path = require("path");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+import dotenv from "dotenv";
+dotenv.config();
+
+import cors from "cors";
+import express from "express";
+import path from "path";
+
+import { MongoClient, ServerApiVersion } from "mongodb";
 const uri = process.env.MONGODB_URI;
 
-
-const userRoutes = require("./routes/user.js"); // Essa rota deve conter o endpoint para salvar os dados do usuário
-const instagramRoutes = require("./routes/instagram.js"); // ajuste o caminho conforme sua estrutura
+import apiRoutes from "./routes/index.js";
 
 const app = express();
 
 // Middlewares para processar JSON e dados de formulários
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: "http://localhost:3000" }));
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -42,17 +45,15 @@ async function run() {
 run().catch(console.dir);
 
 // Serve arquivos estáticos da pasta 'public'
-app.use(express.static(path.join(__dirname, "public")));
-app.use("/assets", express.static(path.join(__dirname, "assets")));
-app.use(express.static(path.join(__dirname, 'dist')))
+app.use(express.static("public"));
+app.use("/assets", express.static("assets"));
 
 // Monta as rotas da API
-app.use("/api/user", userRoutes);
-app.use("/api/instagram-access-token", instagramRoutes);
+app.use("/api", apiRoutes);
 
 // Rota para servir a página principal
 app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.send(path.join(__dirname, "index.html"));
 });
 
 app.get("/politica", (_req, res) => {
