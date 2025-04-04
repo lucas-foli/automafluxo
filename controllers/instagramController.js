@@ -42,8 +42,9 @@ export const getAccessToken = async (req, res) => {
 
     // Retorna os dados obtidos para o front-end
     const data = res.json(response.data);
-    console.log("getAccessToken response", response.data);
-    getLongAccessToken(data);
+    // console.log("getAccessToken response", data);
+    // const tokenResponse = await getLongAccessToken(response.data);
+    // res.status(200).json(tokenResponse.data)
   } catch (error) {
     console.error("Erro ao buscar o access token:", error);
     const status = error.response ? error.response.status : 500;
@@ -69,4 +70,24 @@ export const getLongAccessToken = async (getTokenData) => {
   } catch (error) {
     console.error("Error fetching access token:", error);
   }
+};
+
+
+const saveUserToDatabase = async ({ fbUserId, name, token }) => {
+  const database = client.db("instagram_connections");
+  const collection = database.collection("tokens");
+
+  const doc = { name: name, userId: fbUserId, token: token };
+  const result = await collection.insertOne(doc);
+  console.log(`A document was inserted with the _id: ${result.insertedId}`);
+  // fetch('/api/save-user', {
+  //   method: 'POST',
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify({ fbUserId, name })
+  // })
+  // .then(response => response.json())
+  // .then(data => console.log('User saved:', data))
+  // .catch(err => console.error('Error saving user:', err));
 };
