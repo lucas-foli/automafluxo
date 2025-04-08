@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  fbUserId: { type: String, required: true, unique: true },
+  userId: { type: String, required: true, unique: true },
   name: String,
-  instagramBusinessId: String,
+  token: { type: String, required: true, unique: true },
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);
