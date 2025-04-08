@@ -4,6 +4,7 @@ dotenv.config();
 import cors from "cors";
 import express from "express";
 import path from "path";
+import { fileURLToPath } from "url";
 
 import { MongoClient, ServerApiVersion } from "mongodb";
 const uri = process.env.MONGODB_URI;
@@ -11,6 +12,10 @@ const uri = process.env.MONGODB_URI;
 import apiRoutes from "./routes/index.js";
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+// This gives you the directory of the current file
+const __dirname = path.dirname(__filename);
 
 // Middlewares para processar JSON e dados de formulários
 app.use(express.json());
