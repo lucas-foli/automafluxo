@@ -50,6 +50,7 @@ export const getAccessToken = async (req, res) => {
 
     shortToken = response.data.access_token;
     userId = response.data.user_id;
+    console.log("shortToken exchanged: ", shortToken);
   } catch (error) {
     console.error("Failed to get short-lived access token:", error);
     const status = error.response ? error.response.status : 500;
@@ -63,6 +64,7 @@ export const getAccessToken = async (req, res) => {
   try {
     const tokenResponse = await getLongAccessToken(shortToken);
     longToken = tokenResponse.access_token;
+    console.log("token extended: ", longToken);
   } catch (error) {
     console.error("Error getting long-lived token:", error);
     const status = error.response ? error.response.status : 500;
@@ -78,7 +80,12 @@ export const getAccessToken = async (req, res) => {
 
   // 4. Save the user data to the database
   try {
-    await saveUserData({ userId, name: "simplifiqa", token: longToken });
+    const user = await saveUserData({
+      userId,
+      name: "simplifiqa",
+      token: longToken,
+    });
+    console.log("User saved successfully:", { user });
   } catch (error) {
     console.error("Error saving user data:", error);
     return res.status(500).json({
@@ -89,7 +96,7 @@ export const getAccessToken = async (req, res) => {
 
   return res
     .status(200)
-    .json({ message: "User successfully authenticated", userId });
+    .json({ message: "User successfully authenticated", userId, longToken });
 };
 
 const getLongAccessToken = async (token) => {

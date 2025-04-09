@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 router.get("/instagram/initiate", initiateInstagramFlow);
-router.get("/instagram/access-token", getAccessToken);
+router.get("/instagram/callback", getAccessToken);
 router.get("/instagram/delete-data", deleteUserData);
 
 export default router;

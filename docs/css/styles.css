@@ -48,13 +48,13 @@ pre {
 
 h1 {
     font-size: 2.5em;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     text-shadow: 10px 10px 10px rgba(2, 46, 118, 0.5);
 }
 
 p {
     font-size: 1.2em;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
     text-shadow: 10px 10px 10px rgba(2, 46, 118, 0.5);
     text-align: center;
 }
@@ -92,3 +92,9 @@ body::before {
     /* Ajuste a opacidade aqui */
     z-index: -1;
 }
+
+#status {
+    font-size: 1rem;
+    color: #f2f2f2;
+    margin-top: 0px;
+  }

@@ -45,23 +45,10 @@ mongoose
   .catch((err) => console.error("❌ Mongoose connection error:", err));
 
 // Serve arquivos estáticos da pasta 'public'
-app.use("/", express.static("frontend"));
+app.use("/", express.static("docs"));
 
 // Monta as rotas da API
 app.use("/api", apiRoutes);
-
-// Rota para servir a página principal
-// app.get("/", (_req, res) => {
-//   res.send(path.join(__dirname, "index.html"));
-// });
-
-// app.get("/politica", (_req, res) => {
-//   res.sendFile(path.join(__dirname, "/public/politica.html"));
-// });
-
-// app.get("/termos", (_req, res) => {
-//   res.sendFile(path.join(__dirname, "/public/termos.html"));
-// });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
