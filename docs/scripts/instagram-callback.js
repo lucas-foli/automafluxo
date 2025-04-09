@@ -1,3 +1,5 @@
+import API_BASE_URL from "./config.js";
+
 (async () => {
   const statusEl = document.getElementById("status");
   const instagramLoginButton = document.getElementById("instagram-login");
@@ -11,7 +13,7 @@
   }
 
   try {
-    const response = await fetch(`/api/instagram/callback?code=${code}`);
+    const response = await fetch(`${API_BASE_URL}/api/instagram/callback?code=${code}`);
 
     if (!response.ok) {
       const error = await response.json();

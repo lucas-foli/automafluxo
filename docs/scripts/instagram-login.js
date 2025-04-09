@@ -13,9 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   authorizeButton.addEventListener("click", () => {
     const code = window.location.href.split("code=")[1].split("#_")[0];
-    fetch(`/api/instagram/access-token?code=${code}`);
+    fetch(`${API_BASE_URL}/api/instagram/access-token?code=${code}`);
   });
   saveMeButton.addEventListener("click", () => {
-    fetch("/api/save-user?fbUserId=123&name=John Doe");
+    fetch(`${API_BASE_URL}/api/save-user?fbUserId=123&name=John Doe`);
   });
 });
