@@ -9,6 +9,7 @@ const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
 
+
 export const initiateInstagramFlow = async (req, res) => {
   const url =
     "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +

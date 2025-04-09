@@ -32,12 +32,27 @@ app.use((req, res, next) => {
   next(); // Continua normalmente para os próximos middlewares ou rotas
 });
 
-
-
 // Middlewares para processar JSON e dados de formulários
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: "http://localhost:3000" }));
+
+const allowedOrigins = [
+  "https://www.automafluxo.com.br",
+  "http://localhost:3000",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 mongoose
   .connect(process.env.MONGODB_URI)
