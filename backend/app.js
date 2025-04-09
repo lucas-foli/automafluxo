@@ -21,11 +21,6 @@ mongoose
 const app = express();
 app.set("trust proxy", true);
 
-const allowedOrigins = [
-  "https://www.automafluxo.com.br",
-  "http://localhost:3000",
-];
-
 const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
