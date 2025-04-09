@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 /* NEEDS CLEANUP
     - Remove saveMeButton
     - Remove authorizeButton
@@ -9,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   instagramLoginButton.addEventListener(
     "click",
-    () => (window.location.href = "/api/instagram/initiate")
+    () => (window.location.href = `${API_BASE_URL}/api/instagram/initiate`)
   );
   authorizeButton.addEventListener("click", () => {
     const code = window.location.href.split("code=")[1].split("#_")[0];
