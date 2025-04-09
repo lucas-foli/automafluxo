@@ -1,3 +1,7 @@
+/* NEEDS CLEANUP
+    - Remove saveMeButton
+    - Remove authorizeButton
+*/
 document.addEventListener("DOMContentLoaded", () => {
   const instagramLoginButton = document.getElementById("instagram-login");
   const authorizeButton = document.getElementById("authorize");
