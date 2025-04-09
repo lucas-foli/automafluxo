@@ -10,6 +10,7 @@ import apiRoutes from "./routes/index.js";
 import mongoose from "mongoose";
 
 const app = express();
+app.set('trust proxy', true);
 
 const __filename = fileURLToPath(import.meta.url);
 // This gives you the directory of the current file
