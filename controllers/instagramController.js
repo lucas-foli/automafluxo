@@ -61,7 +61,7 @@ export const getAccessToken = async (req, res) => {
 
   // 2. Get the long-lived access token
   try {
-    const tokenResponse = await getLongAccessToken(token);
+    const tokenResponse = await getLongAccessToken(shortToken);
     longToken = tokenResponse.access_token;
   } catch (error) {
     console.error("Error getting long-lived token:", error);
@@ -78,7 +78,7 @@ export const getAccessToken = async (req, res) => {
 
   // 4. Save the user data to the database
   try {
-    await saveUserData(userId, "simplifiqa", longToken);
+    await saveUserData({ userId, name: "simplifiqa", token: longToken });
   } catch (error) {
     console.error("Error saving user data:", error);
     return res.status(500).json({
