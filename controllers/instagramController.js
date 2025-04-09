@@ -21,18 +21,23 @@ export const initiateInstagramFlow = async (req, res) => {
 };
 
 export const getAccessToken = async (req, res) => {
-  const code = req.url.split("code=")[1];
+  const code = req.url.split("code=")[1].split("#_")[0];
+  if (!code)
+    return res.status(400).json({ error: "Missing authorization code" });
 
-  // Cria os dados do formulário em formato URL encoded
-  const formData = new URLSearchParams();
-  formData.append("client_id", INSTAGRAM_CLIENT_ID);
-  formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
-  formData.append("grant_type", "authorization_code");
-  formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
-  formData.append("code", code);
+  let longToken = "";
+  let shortToken = "";
+  let userId = "";
 
-  let token = "";
+  // 1. Get the short-lived access token
   try {
+    const formData = new URLSearchParams();
+    formData.append("client_id", INSTAGRAM_CLIENT_ID);
+    formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
+    formData.append("grant_type", "authorization_code");
+    formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
+    formData.append("code", code);
+
     const response = await axios.post(
       "https://api.instagram.com/oauth/access_token",
       formData.toString(),
@@ -43,31 +48,51 @@ export const getAccessToken = async (req, res) => {
       }
     );
 
-    const userId  = response.data.user_id;
-    console.log("User ID:", userId);
-    token = response.data.access_token;
-    const tokenResponse = await getLongAccessToken(token);
-    // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
-    // const saveUser = await fetch(`/api/save-user?userId=${userId}&name=simplfiqa&token=${tokenResponse.access_token}`);
-    await saveUserData(userId, 'simplifiqa', tokenResponse.access_token);
-    // saveUser.status(200).json(tokenResponse);
-    res.status(200).json(response.data);
+    shortToken = response.data.access_token;
+    userId = response.data.user_id;
   } catch (error) {
-    console.error("Erro ao buscar o access token:", error);
+    console.error("Failed to get short-lived access token:", error);
     const status = error.response ? error.response.status : 500;
-    res.status(status).json({ error: "Erro interno do servidor" });
+    return res.status(status).json({
+      error: "Failed to get access token from Instagram",
+      details: error.message,
+    });
   }
-  // try {
-  //   const tokenResponse = await getLongAccessToken(token);
-  //   console.log("Token response", tokenResponse);
-  //   res.status(200).json(tokenResponse);
-  // } catch (error) {
-  //   console.error("Error getting long-lived token:", error);
-  //   res.status(500).json({ error: "Failed to get long-lived token" });
-  // }
+
+  // 2. Get the long-lived access token
+  try {
+    const tokenResponse = await getLongAccessToken(token);
+    longToken = tokenResponse.access_token;
+  } catch (error) {
+    console.error("Error getting long-lived token:", error);
+    const status = error.response ? error.response.status : 500;
+    return res.status(status).json({
+      error: "Failed to extend access token",
+      details: error.message,
+    });
+  }
+
+  // 3. TODO: Get the username from userId + token
+  // need to figure out how to get the username
+  // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
+
+  // 4. Save the user data to the database
+  try {
+    await saveUserData(userId, "simplifiqa", longToken);
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    return res.status(500).json({
+      error: "Failed to save user data",
+      details: error.message,
+    });
+  }
+
+  return res
+    .status(200)
+    .json({ message: "User successfully authenticated", userId });
 };
 
-export const getLongAccessToken = async (token) => {
+const getLongAccessToken = async (token) => {
   try {
     const url = `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${INSTAGRAM_CLIENT_SECRET}&access_token=${token}`;
     const response = await axios.get(url);
@@ -78,25 +103,6 @@ export const getLongAccessToken = async (token) => {
   } catch (error) {
     console.error("Error fetching access token:", error);
   }
-};
-
-const saveUserToDatabase = async ({ fbUserId, name, token }) => {
-  const database = client.db("instagram_connections");
-  const collection = database.collection("tokens");
-
-  const doc = { name: name, userId: fbUserId, token: token };
-  const result = await collection.insertOne(doc);
-  console.log(`A document was inserted with the _id: ${result.insertedId}`);
-  // fetch('/api/save-user', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ fbUserId, name })
-  // })
-  // .then(response => response.json())
-  // .then(data => console.log('User saved:', data))
-  // .catch(err => console.error('Error saving user:', err));
 };
 
 export const deleteUserData = (req, res) => {
@@ -162,18 +168,3 @@ function parseSignedRequest(signedRequest, appSecret) {
   }
   return data;
 }
-
-export const getUserData = async () => {
-  const userId = "9164357020324792"
-  const token = "IGAAQLgGchM45BZAE1iWFVsSXB6WktibVVZAd00xM013WkdvdGJQOFlmWG9rY3hjdlZA5eDZAnLXNyTW8teVlZAUnl4bzlpdmFxMU9CZA3JiUnViN1VyU1F4MkVjaUZAoMTZAXQ0l2ZAUIxaTQ2bm54c1RtRXFpR3FR"
-  const url = `https://graph.instagram.com/${userId}?fields=id,username&access_token=${token}`;
-
-  try {
-    const response = await axios.get(url);
-    console.log("User data:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
-  }
-};
