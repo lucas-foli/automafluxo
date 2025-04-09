@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import axios from "axios";
 import dotenv from "dotenv";
+import { saveUserData } from "./user.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
@@ -9,7 +10,6 @@ const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
 
 export const initiateInstagramFlow = async (req, res) => {
-  console.log(INSTAGRAM_CLIENT_ID, INSTAGRAM_REDIRECT_URI);
   const url =
     "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +
     INSTAGRAM_CLIENT_ID +
@@ -21,17 +21,23 @@ export const initiateInstagramFlow = async (req, res) => {
 };
 
 export const getAccessToken = async (req, res) => {
-  const code = req.url.split("code=")[1];
+  const code = req.url.split("code=")[1].split("#_")[0];
+  if (!code)
+    return res.status(400).json({ error: "Missing authorization code" });
 
-  // Cria os dados do formulário em formato URL encoded
-  const formData = new URLSearchParams();
-  formData.append("client_id", INSTAGRAM_CLIENT_ID);
-  formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
-  formData.append("grant_type", "authorization_code");
-  formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
-  formData.append("code", code);
+  let longToken = "";
+  let shortToken = "";
+  let userId = "";
 
+  // 1. Get the short-lived access token
   try {
+    const formData = new URLSearchParams();
+    formData.append("client_id", INSTAGRAM_CLIENT_ID);
+    formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
+    formData.append("grant_type", "authorization_code");
+    formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
+    formData.append("code", code);
+
     const response = await axios.post(
       "https://api.instagram.com/oauth/access_token",
       formData.toString(),
@@ -42,55 +48,61 @@ export const getAccessToken = async (req, res) => {
       }
     );
 
-    // Retorna os dados obtidos para o front-end
-    const data = res.json(response.data);
-    // console.log("getAccessToken response", data);
-    // const tokenResponse = await getLongAccessToken(response.data);
-    // res.status(200).json(tokenResponse.data)
+    shortToken = response.data.access_token;
+    userId = response.data.user_id;
   } catch (error) {
-    console.error("Erro ao buscar o access token:", error);
+    console.error("Failed to get short-lived access token:", error);
     const status = error.response ? error.response.status : 500;
-    res.status(status).json({ error: "Erro interno do servidor" });
+    return res.status(status).json({
+      error: "Failed to get access token from Instagram",
+      details: error.message,
+    });
   }
+
+  // 2. Get the long-lived access token
+  try {
+    const tokenResponse = await getLongAccessToken(shortToken);
+    longToken = tokenResponse.access_token;
+  } catch (error) {
+    console.error("Error getting long-lived token:", error);
+    const status = error.response ? error.response.status : 500;
+    return res.status(status).json({
+      error: "Failed to extend access token",
+      details: error.message,
+    });
+  }
+
+  // 3. TODO: Get the username from userId + token
+  // need to figure out how to get the username
+  // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
+
+  // 4. Save the user data to the database
+  try {
+    await saveUserData({ userId, name: "simplifiqa", token: longToken });
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    return res.status(500).json({
+      error: "Failed to save user data",
+      details: error.message,
+    });
+  }
+
+  return res
+    .status(200)
+    .json({ message: "User successfully authenticated", userId });
 };
 
-export const getLongAccessToken = async (getTokenData) => {
+const getLongAccessToken = async (token) => {
   try {
-    const url = `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${INSTAGRAM_CLIENT_SECRET}&access_token=${getTokenData.access_token}`;
+    const url = `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${INSTAGRAM_CLIENT_SECRET}&access_token=${token}`;
     const response = await axios.get(url);
 
     const data = response.data;
     console.log("getLongAccessToken data", data);
-    // Aqui você pode salvar os dados ou chamar saveUserToDatabase, etc.
-    // saveUserToDatabase({
-    //   fbUserId: data.userId || "userId",
-    //   name: "name",
-    //   token: data, // ou o token específico, conforme necessário
-    // });
-    res.status(200).json(data);
-    window.alert("User connected!");
+    return data;
   } catch (error) {
     console.error("Error fetching access token:", error);
   }
-};
-
-const saveUserToDatabase = async ({ fbUserId, name, token }) => {
-  const database = client.db("instagram_connections");
-  const collection = database.collection("tokens");
-
-  const doc = { name: name, userId: fbUserId, token: token };
-  const result = await collection.insertOne(doc);
-  console.log(`A document was inserted with the _id: ${result.insertedId}`);
-  // fetch('/api/save-user', {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ fbUserId, name })
-  // })
-  // .then(response => response.json())
-  // .then(data => console.log('User saved:', data))
-  // .catch(err => console.error('Error saving user:', err));
 };
 
 export const deleteUserData = (req, res) => {
@@ -106,7 +118,8 @@ export const deleteUserData = (req, res) => {
       100000 + Math.random() * 900000
     ).toString(); // Gere um código único, por exemplo
     const statusUrl =
-      "https://www.automafluxo.com.br/api/instagram/delete-data?id=" + confirmationCode;
+      "https://www.automafluxo.com.br/api/instagram/delete-data?id=" +
+      confirmationCode;
     return res.json({
       url: statusUrl,
       confirmation_code: confirmationCode,
