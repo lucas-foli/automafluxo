@@ -68,7 +68,8 @@ app.use("/", express.static("docs"));
 app.use("/api", apiRoutes);
 
 app.use((req, res, next) => {
-  const isRoot = req.hostname === "automafluxo.com.br";
+  console.log(req.hostwname, req.originalUrl);    
+  const isRoot = req.hostnwame === "automafluxo.com.br";
   const isApi = req.originalUrl.startsWith("/api");
   const isStatic = req.originalUrl.startsWith("/assets");
 
