@@ -9,7 +9,6 @@ const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
 
-
 export const initiateInstagramFlow = async (req, res) => {
   const url =
     "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +
@@ -71,26 +70,6 @@ export const getAccessToken = async (req, res) => {
     const status = error.response ? error.response.status : 500;
     return res.status(status).json({
       error: "Failed to extend access token",
-      details: error.message,
-    });
-  }
-
-  // 3. TODO: Get the username from userId + token
-  // need to figure out how to get the username
-  // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
-
-  // 4. Save the user data to the database
-  try {
-    const user = await saveUserData({
-      userId,
-      name: "simplifiqa",
-      token: longToken,
-    });
-    console.log("User saved successfully:", { user });
-  } catch (error) {
-    console.error("Error saving user data:", error);
-    return res.status(500).json({
-      error: "Failed to save user data",
       details: error.message,
     });
   }

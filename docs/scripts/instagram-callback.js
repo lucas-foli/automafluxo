@@ -10,33 +10,56 @@
     return;
   }
 
-  try {
-    const response = await fetch(`https://api.automafluxo.com.br/api/instagram/callback?code=${code}`);
+  await handleInstagramCallback();
+  await saveUser();
 
-    if (!response.ok) {
-      const error = await response.json();
-      statusEl.textContent =
-        "Failed to connect: " + (error.message || "Unknown error");
+  const handleInstagramCallback = async () => {
+    try {
+      const response = await fetch(`https://api.automafluxo.com.br/api/instagram/callback?code=${code}`);
+
+      if (!response.ok) {
+        const error = await response.json();
+        statusEl.textContent =
+          "Failed to connect: " + (error.message || "Unknown error");
+        instagramLoginButton.hidden = false;
+        instagramLoginButton.addEventListener(
+          "click",
+          () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/instagram/initiate' : 'https://api.automafluxo.com.br/api/instagram/initiate')
+        );
+        return;
+      }
+
+      const result = await response.json();
+      statusEl.textContent = "Instagram account connected successfully!";
+    } catch (error) {
+      statusEl.textContent = "Something went wrong: " + error.message;
       instagramLoginButton.hidden = false;
       instagramLoginButton.addEventListener(
         "click",
         () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/instagram/initiate' : 'https://api.automafluxo.com.br/api/instagram/initiate')
       );
-
-      return;
     }
+  }
 
-    const result = await response.json();
-    statusEl.textContent = "Instagram account connected successfully!";
+  const saveUser = async () => {
+    try {
+      const response = await fetch("https://api.automafluxo.com.br/api/save-user");
 
-    // Optional redirect after a few seconds:
-    // setTimeout(() => window.location.href = '/dashboard', 3000);
-  } catch (error) {
-    statusEl.textContent = "Something went wrong: " + error.message;
-    instagramLoginButton.hidden = false;
-    instagramLoginButton.addEventListener(
-      "click",
-      () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/instagram/initiate' : 'https://api.automafluxo.com.br/api/instagram/initiate')
-    );
+      if (!response.ok) {
+        const error = await response.json();
+        statusEl.textContent =
+          "Failed to save user: " + (error.message || "Unknown error");
+        return;
+      }
+
+      const result = await response.json();
+      console.log("User saved:", result);
+    } catch (error) {
+      statusEl.textContent = "Something went wrong: " + error.message;
+      instagramLoginButton.addEventListener(
+        "click",
+        () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/instagram/initiate' : 'https://api.automafluxo.com.br/api/instagram/initiate')
+      );
+    }
   }
 })();
