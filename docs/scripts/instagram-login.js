@@ -16,6 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`/api/instagram/access-token?code=${code}`);
   });
   saveMeButton.addEventListener("click", () => {
-    fetch(`/api/save-user?fbUserId=123&name=John Doe`);
+    fetch(`/api/instagram/save-user`);
   });
 });
