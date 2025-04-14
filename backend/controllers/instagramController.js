@@ -75,8 +75,8 @@ export const getAccessToken = async (req, res) => {
     });
   }
 
-  // 3. TODO: Get the username from userId + token
-  const username = await getUserData(userId, longToken);
+  // 3. TODO: Get the username from token
+  const username = await getUserData(longToken);
 
   // 4. Save the user data to the database
   try {
