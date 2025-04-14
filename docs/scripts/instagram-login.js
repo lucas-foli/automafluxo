@@ -1,5 +1,3 @@
-import { API_BASE_URL } from "../scripts/config.js";
-
 /* NEEDS CLEANUP
     - Remove saveMeButton
     - Remove authorizeButton
@@ -11,13 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   instagramLoginButton.addEventListener(
     "click",
-    () => (window.location.href = `${API_BASE_URL}/api/instagram/initiate`)
+    () => (window.location.href = `/api/instagram/initiate`)
   );
   authorizeButton.addEventListener("click", () => {
     const code = window.location.href.split("code=")[1].split("#_")[0];
-    fetch(`${API_BASE_URL}/api/instagram/access-token?code=${code}`);
+    fetch(`/api/instagram/access-token?code=${code}`);
   });
   saveMeButton.addEventListener("click", () => {
-    fetch(`${API_BASE_URL}/api/save-user?fbUserId=123&name=John Doe`);
+    fetch(`/api/save-user?fbUserId=123&name=John Doe`);
   });
 });
