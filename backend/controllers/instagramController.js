@@ -76,7 +76,7 @@ export const getAccessToken = async (req, res) => {
   }
 
   // 3. TODO: Get the username from userId + token
-  const username = await getUserData(response.data.user_id, tokenResponse.access_token);
+  const username = await getUserData(userId, longToken);
 
   // 4. Save the user data to the database
   try {
