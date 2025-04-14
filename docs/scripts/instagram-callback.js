@@ -1,7 +1,7 @@
 const statusEl = document.getElementById("status");
 const instagramLoginButton = document.getElementById("instagram-login");
 
-const handleInstagramCallback = async () => {
+const handleInstagramCallback = async (code) => {
   try {
     const response = await fetch(
       `https://api.automafluxo.com.br/api/instagram/callback?code=${code}`
@@ -74,6 +74,6 @@ const saveUser = async () => {
     return;
   }
 
-  await handleInstagramCallback();
+  await handleInstagramCallback(code);
   await saveUser();
 })();
