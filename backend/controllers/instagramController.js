@@ -1,13 +1,14 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import axios from "axios";
 import dotenv from "dotenv";
-import { saveUserData, getUserData } from "./user.js";
+import { saveUserData } from "./user.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
+
 
 export const initiateInstagramFlow = async (req, res) => {
   const url =
@@ -28,7 +29,6 @@ export const getAccessToken = async (req, res) => {
   let longToken = "";
   let shortToken = "";
   let userId = "";
-  let username = ""
 
   // 1. Get the short-lived access token
   try {
@@ -75,25 +75,15 @@ export const getAccessToken = async (req, res) => {
     });
   }
 
-  try {
-    username = await getUserData(shortToken);
-    console.log("User data:", username);
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    const status = error.response ? error.response.status : 500;
-    return res.status(status).json({
-      error: "Failed to fetch user data",
-      details: error.message,
-    });
-  }
+  // 3. TODO: Get the username from userId + token
   // need to figure out how to get the username
   // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
-  
+
   // 4. Save the user data to the database
   try {
     const user = await saveUserData({
       userId,
-      name: username,
+      name: "simplifiqa",
       token: longToken,
     });
     console.log("User saved successfully:", { user });
@@ -104,7 +94,6 @@ export const getAccessToken = async (req, res) => {
       details: error.message,
     });
   }
-
 
   return res
     .status(200)
