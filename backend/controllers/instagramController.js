@@ -76,14 +76,13 @@ export const getAccessToken = async (req, res) => {
   }
 
   // 3. TODO: Get the username from userId + token
-  // need to figure out how to get the username
-  // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
+  const username = await getUserData(response.data.user_id, tokenResponse.access_token);
 
   // 4. Save the user data to the database
   try {
     const user = await saveUserData({
       userId,
-      name: "simplifiqa",
+      name: username,
       token: longToken,
     });
     console.log("User saved successfully:", { user });
@@ -176,3 +175,15 @@ function parseSignedRequest(signedRequest, appSecret) {
   }
   return data;
 }
+
+export const getUserData = async (token) => {
+  try {
+    const url = `https://graph.instagram.com/me?fields=username&access_token=${token}`;
+    const response = await axios.get(url);
+    const username = await response.data.username;
+    return username;
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    throw error;
+  }
+};
