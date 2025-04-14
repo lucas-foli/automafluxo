@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import axios from "axios";
 import dotenv from "dotenv";
-import { saveUserData } from "./user.js";
+import { saveUserData, getUserData } from "./user.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
@@ -28,6 +28,7 @@ export const getAccessToken = async (req, res) => {
   let longToken = "";
   let shortToken = "";
   let userId = "";
+  let username = ""
 
   // 1. Get the short-lived access token
   try {
@@ -73,6 +74,37 @@ export const getAccessToken = async (req, res) => {
       details: error.message,
     });
   }
+
+  try {
+    username = await getUserData(shortToken);
+    console.log("User data:", username);
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    const status = error.response ? error.response.status : 500;
+    return res.status(status).json({
+      error: "Failed to fetch user data",
+      details: error.message,
+    });
+  }
+  // need to figure out how to get the username
+  // const userData = await getUserData(response.data.user_id, tokenResponse.access_token);
+  
+  // 4. Save the user data to the database
+  try {
+    const user = await saveUserData({
+      userId,
+      name: username,
+      token: longToken,
+    });
+    console.log("User saved successfully:", { user });
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    return res.status(500).json({
+      error: "Failed to save user data",
+      details: error.message,
+    });
+  }
+
 
   return res
     .status(200)

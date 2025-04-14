@@ -75,5 +75,5 @@ const saveUser = async () => {
   }
 
   await handleInstagramCallback(code);
-  await saveUser();
+  // await saveUser();
 })();
