@@ -1,5 +1,6 @@
 const APP_ID = process.env.APP_ID;
 const REDIRECT_URI = process.env.REDIRECT_URI;
+const APP_SECRET = process.env.APP_SECRET;
 
 export const initiateFbLogin = async (req, res) => {
   const redirectUrl = `https://www.facebook.com/v20.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(
@@ -18,8 +19,8 @@ export const getFbAccessToken = async (req, res) => {
 
   try {
     const formData = new URLSearchParams();
-    formData.append("client_id", INSTAGRAM_CLIENT_ID);
-    formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
+    formData.append("client_id", APP_ID);
+    formData.append("client_secret", APP_SECRET);
     formData.append("redirect_uri", REDIRECT_URI);
     formData.append("code", code);
 
@@ -27,8 +28,8 @@ export const getFbAccessToken = async (req, res) => {
       "https://graph.facebook.com/v20.0/oauth/access_token",
       {
         params: {
-          client_id: INSTAGRAM_CLIENT_ID,
-          client_secret: INSTAGRAM_CLIENT_SECRET,
+          client_id: APP_ID,
+          client_secret: APP_SECRET,
           redirect_uri: REDIRECT_URI,
           code: code,
         },

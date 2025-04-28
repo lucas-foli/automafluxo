@@ -36,7 +36,7 @@
     loginButton.hidden = false;
     loginButton.addEventListener(
       "click",
-      () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/instagram/initiate' : 'https://api.automafluxo.com.br/api/instagram/initiate')
+      () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/facebook/login' : 'https://api.automafluxo.com.br/api/facebook/login')
     );
   }
 })();
