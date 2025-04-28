@@ -36,7 +36,7 @@
     tokenParagraph.hidden = false;
     connectedParagraph.hidden = false;
     
-    usernameParagraph.textContent = `Hello ${result.username}!`;
+    usernameParagraph.textContent = `Hello @${result.username}!`;
     connectedParagraph.textContent = `You can start using the features of Automafluxo`;
     userIdParagraph.textContent = `Your user ID is ${result.userId}.`;
     
