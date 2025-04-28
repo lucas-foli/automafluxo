@@ -1,9 +1,6 @@
 (async () => {
   const statusEl = document.getElementById("status");
   const usernameHeader = document.getElementById("username");
-  const userIdParagraph = document.getElementById("userId");
-  const tokenParagraph = document.getElementById("token");
-  const connectedParagraph = document.getElementById("connected");
   const loginButton = document.getElementById("login");
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
@@ -37,9 +34,6 @@
 
     const result = await response.json();
     usernameHeader.hidden = false;
-    userIdParagraph.hidden = false;
-    tokenParagraph.hidden = false;
-    connectedParagraph.hidden = false;
 
     const img = document.createElement("img");
     img.src = result.profilePictureUrl;
@@ -50,14 +44,17 @@
 
     const helloTxt = document.createTextNode("Hello ");
     const usernameTxt = document.createTextNode(`@${result.username}`);
-    usernameHeader.append(helloTxt, img, usernameTxt); // Append the image to the header
+    const userIdTxt = document.createElement("span");
+    userIdTxt.textContent = `Your user ID is ${result.userId}.`;
+    const connectedTxt = document.createElement("span");
+    connectedTxt.textContent =
+      "You can start using the features of Automafluxo";
+
+    usernameHeader.append(helloTxt, img, usernameTxt, userIdTxt, connectedTxt); // Append the image to the header
 
     usernameHeader.style.display = "flex";
     usernameHeader.style.alignItems = "center";
     usernameHeader.style.gap = "8px"; // space between picture and text
-
-    connectedParagraph.textContent = `You can start using the features of Automafluxo`;
-    userIdParagraph.textContent = `Your user ID is ${result.userId}.`;
 
     statusEl.textContent = "Instagram account connected successfully!";
 
