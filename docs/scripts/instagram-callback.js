@@ -1,9 +1,13 @@
 (async () => {
-  const statusEl = document.getElementById("status");
-  const usernameHeader = document.getElementById("username");
+  const connectionResult = document.getElementById("connoection-result");
   const loginButton = document.getElementById("login");
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
+
+  connectionResult.innerHTML = `
+  <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+  Instagram account connected successfully!
+</p>`;
 
   if (!code) {
     statusEl.textContent = "Missing authorization code.";
@@ -18,8 +22,9 @@
 
     if (!response.ok) {
       const error = await response.json();
-      statusEl.textContent =
-        "Failed to connect: " + (error.message || "Unknown error");
+      connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+      Failed to connect: ${error.message || 'Unknown error'};
+    </p>`;
       loginButton.hidden = false;
       loginButton.addEventListener(
         "click",
@@ -33,7 +38,6 @@
     }
 
     const result = await response.json();
-    usernameHeader.hidden = false;
 
     const img = document.createElement("img");
     img.src = result.profilePictureUrl;
@@ -42,21 +46,35 @@
     img.style.height = "50px"; // Set the height of the image
     img.style.borderRadius = "50%"; // Make it circular
 
-    const helloTxt = document.createTextNode("Hello ");
-    const usernameTxt = document.createTextNode(`@${result.username}`);
-    const userIdTxt = document.createElement("span");
-    userIdTxt.textContent = `Your user ID is ${result.userId}.`;
-    const connectedTxt = document.createElement("span");
-    connectedTxt.textContent =
-      "You can start using the features of Automafluxo";
-
-    usernameHeader.append(helloTxt, img, usernameTxt, userIdTxt, connectedTxt); // Append the image to the header
-
-    usernameHeader.style.display = "flex";
-    usernameHeader.style.alignItems = "center";
-    usernameHeader.style.gap = "8px"; // space between picture and text
-
-    statusEl.textContent = "Instagram account connected successfully!";
+    connectionResult.innerHTML = `
+  <div style="
+    background: rgba(0, 0, 0, 0.7);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 400px;
+    margin: auto;
+    text-align: left;
+    color: #fff;
+  ">
+    <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+      Instagram account connected successfully!
+    </p>
+    <ul style="list-style: none; padding: 0; margin: 0 0 16px 0;">
+      <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+        <strong>Username:</strong> 
+        <img src="${result.profilePictureUrl}" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
+        @${result.username}
+      </li>
+      <li style="margin-bottom: 10px;">
+        <strong>User ID:</strong> ${result.userId}
+      </li>
+    </ul>
+    <p style="margin: 0; font-size: 16px; text-align: center;">
+      You can start using the features of Automafluxo
+    </p>
+  </div>
+`;
 
     // Optional redirect after a few seconds:
     // setTimeout(() => window.location.href = '/dashboard', 3000);
