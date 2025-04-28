@@ -1,17 +1,30 @@
 (async () => {
   const connectionResult = document.getElementById("connection-result");
+  const connectionHeader = document.getElementById("connection-header");
   const loginButton = document.getElementById("login");
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
 
-  connectionResult.innerHTML = `
-  <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
-  Instagram account connected successfully!
+  const loginHandler = () => {
+    loginButton.addEventListener(
+      "click",
+      () =>
+        (window.location.href = window.location.hostname.includes("localhost")
+          ? "http://localhost:3000/api/instagram/initiate"
+          : "https://api.automafluxo.com.br/api/instagram/initiate")
+    );
+  }
+
+  connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+  Processing...
 </p>`;
 
   if (!code) {
-    statusEl.textContent = "Missing authorization code.";
+    connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+    Missing authorization code
+  </p>`;
     loginButton.hidden = false;
+    loginHandler();
     return;
   }
 
@@ -23,16 +36,10 @@
     if (!response.ok) {
       const error = await response.json();
       connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
-      Failed to connect: ${error.message || 'Unknown error'};
+      Failed to connect: ${error.message || "Unknown error"};
     </p>`;
       loginButton.hidden = false;
-      loginButton.addEventListener(
-        "click",
-        () =>
-          (window.location.href = window.location.hostname.includes("localhost")
-            ? "http://localhost:3000/api/instagram/initiate"
-            : "https://api.automafluxo.com.br/api/instagram/initiate")
-      );
+      loginHandler();
 
       return;
     }
@@ -46,6 +53,12 @@
     img.style.height = "50px"; // Set the height of the image
     img.style.borderRadius = "50%"; // Make it circular
 
+    connectionHeader.innerHTML = `
+    <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+      Welcome
+      <img src="${result.profilePictureUrl}" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
+        @${result.username}!
+    </p>`;
     connectionResult.innerHTML = `
   <div style="
     background: rgba(0, 0, 0, 0.7);
@@ -81,12 +94,6 @@
   } catch (error) {
     statusEl.textContent = "Something went wrong: " + error.message;
     loginButton.hidden = false;
-    loginButton.addEventListener(
-      "click",
-      () =>
-        (window.location.href = window.location.hostname.includes("localhost")
-          ? "http://localhost:3000/api/instagram/initiate"
-          : "https://api.automafluxo.com.br/api/instagram/initiate")
-    );
+    loginHandler();
   }
 })();
