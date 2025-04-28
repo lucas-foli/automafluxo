@@ -1,5 +1,5 @@
 (async () => {
-  const connectionResult = document.getElementById("connoection-result");
+  const connectionResult = document.getElementById("connection-result");
   const loginButton = document.getElementById("login");
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
