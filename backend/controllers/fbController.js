@@ -1,10 +1,10 @@
 const APP_ID = process.env.APP_ID;
-const REDIRECT_URI = process.env.REDIRECT_URI;
+const FACEBOOK_REDIRECT_URI = process.env.FACEBOOK_REDIRECT_URI;
 const APP_SECRET = process.env.APP_SECRET;
 
 export const initiateFbLogin = async (req, res) => {
   const redirectUrl = `https://www.facebook.com/v20.0/dialog/oauth?client_id=${APP_ID}&redirect_uri=${encodeURIComponent(
-    REDIRECT_URI
+    FACEBOOK_REDIRECT_URI
   )}&scope=public_profile,pages_show_list,pages_read_engagement,pages_messaging`;
   res.redirect(redirectUrl);
 };
@@ -21,7 +21,7 @@ export const getFbAccessToken = async (req, res) => {
     const formData = new URLSearchParams();
     formData.append("client_id", APP_ID);
     formData.append("client_secret", APP_SECRET);
-    formData.append("redirect_uri", REDIRECT_URI);
+    formData.append("redirect_uri", FACEBOOK_REDIRECT_URI);
     formData.append("code", code);
 
     const response = await axios.get(
@@ -30,7 +30,7 @@ export const getFbAccessToken = async (req, res) => {
         params: {
           client_id: APP_ID,
           client_secret: APP_SECRET,
-          redirect_uri: REDIRECT_URI,
+          redirect_uri: FACEBOOK_REDIRECT_URI,
           code: code,
         },
       }

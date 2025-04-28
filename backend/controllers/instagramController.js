@@ -5,7 +5,7 @@ import { saveUserData } from "./user.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
-const REDIRECT_URI = process.env.REDIRECT_URI;
+const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
 
@@ -15,7 +15,7 @@ export const initiateInstagramFlow = async (req, res) => {
     "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +
     INSTAGRAM_CLIENT_ID +
     "&redirect_uri=" +
-    REDIRECT_URI +
+    INSTAGRAM_REDIRECT_URI +
     "&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.redirect(url);
@@ -36,7 +36,7 @@ export const getAccessToken = async (req, res) => {
     formData.append("client_id", INSTAGRAM_CLIENT_ID);
     formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
     formData.append("grant_type", "authorization_code");
-    formData.append("redirect_uri", REDIRECT_URI);
+    formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
     formData.append("code", code);
 
     const response = await axios.post(
@@ -52,6 +52,7 @@ export const getAccessToken = async (req, res) => {
     shortToken = response.data.access_token;
     userId = response.data.user_id;
     console.log("shortToken exchanged: ", shortToken);
+    console.log("User data for short token ", response.data);
   } catch (error) {
     console.error("Failed to get short-lived access token:", error);
     const status = error.response ? error.response.status : 500;
@@ -66,6 +67,7 @@ export const getAccessToken = async (req, res) => {
     const tokenResponse = await getLongAccessToken(shortToken);
     longToken = tokenResponse.access_token;
     console.log("token extended: ", longToken);
+    console.log("User data for long token ", tokenResponse.data);
   } catch (error) {
     console.error("Error getting long-lived token:", error);
     const status = error.response ? error.response.status : 500;
@@ -86,6 +88,7 @@ export const getAccessToken = async (req, res) => {
       token: longToken,
     });
     console.log("User saved successfully:", { user });
+    console.log("User data saveUserData ", user.data);
   } catch (error) {
     console.error("Error saving user data:", error);
     return res.status(500).json({
@@ -96,7 +99,7 @@ export const getAccessToken = async (req, res) => {
 
   return res
     .status(200)
-    .json({ message: "User successfully authenticated", userId, longToken });
+    .json({ message: "User successfully authenticated", userId, longToken, username });
 };
 
 const getLongAccessToken = async (token) => {
