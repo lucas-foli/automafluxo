@@ -1,6 +1,6 @@
 (async () => {
   const statusEl = document.getElementById("status");
-  const usernameParagraph = document.getElementById("username");
+  const usernameHeader = document.getElementById("username");
   const userIdParagraph = document.getElementById("userId");
   const tokenParagraph = document.getElementById("token");
   const connectedParagraph = document.getElementById("connected");
@@ -31,12 +31,22 @@
     }
 
     const result = await response.json();
-    usernameParagraph.hidden = false;
+    usernameHeader.hidden = false;
     userIdParagraph.hidden = false;
     tokenParagraph.hidden = false;
     connectedParagraph.hidden = false;
     
-    usernameParagraph.textContent = `Hello @${result.username}!`;
+    const img = document.createElement("img");
+    img.src = result.profilePictureUrl;
+    img.alt = "Profile Picture";
+    img.style.width = "50px"; // Set the width of the image
+    img.style.height = "50px"; // Set the height of the image
+    img.style.borderRadius = "50%"; // Make it circular
+
+    usernameHeader.innerHTML = `Hello `;
+    usernameHeader.append(img); // Append the image to the header
+    usernameHeader.innerHTML = `@${result.username}!`;
+    
     connectedParagraph.textContent = `You can start using the features of Automafluxo`;
     userIdParagraph.textContent = `Your user ID is ${result.userId}.`;
     

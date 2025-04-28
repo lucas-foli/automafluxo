@@ -78,7 +78,7 @@ export const getAccessToken = async (req, res) => {
   }
 
   // 3. TODO: Get the username from token
-  const username = await getUserData(longToken);
+  const {username, profilePictureUrl} = await getUserData(longToken);
 
   // 4. Save the user data to the database
   try {
@@ -99,7 +99,7 @@ export const getAccessToken = async (req, res) => {
 
   return res
     .status(200)
-    .json({ message: "User successfully authenticated", userId, longToken, username });
+    .json({ message: "User successfully authenticated", userId, longToken, username, profilePictureUrl });
 };
 
 const getLongAccessToken = async (token) => {
@@ -139,6 +139,7 @@ export const deleteUserData = (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 /**
  * Função para decodificar strings em Base64 URL-safe
@@ -181,10 +182,15 @@ function parseSignedRequest(signedRequest, appSecret) {
 
 export const getUserData = async (token) => {
   try {
-    const url = `https://graph.instagram.com/me?fields=username&access_token=${token}`;
+    const url = `https://graph.instagram.com/me?fields=username,profile_picture_url&access_token=${token}`;
     const response = await axios.get(url);
     const username = await response.data.username;
-    return username;
+    const profilePictureUrl = await response.data.profile_picture_url;
+    const userData = {
+      username,
+      profilePictureUrl,
+    };
+    return userData;
   } catch (error) {
     console.error("Error fetching user data:", error);
     throw error;
