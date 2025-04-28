@@ -5,7 +5,7 @@ import { saveUserData } from "./user.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
-const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
+const REDIRECT_URI = process.env.REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
 
@@ -15,7 +15,7 @@ export const initiateInstagramFlow = async (req, res) => {
     "https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=" +
     INSTAGRAM_CLIENT_ID +
     "&redirect_uri=" +
-    INSTAGRAM_REDIRECT_URI +
+    REDIRECT_URI +
     "&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.redirect(url);
@@ -36,7 +36,7 @@ export const getAccessToken = async (req, res) => {
     formData.append("client_id", INSTAGRAM_CLIENT_ID);
     formData.append("client_secret", INSTAGRAM_CLIENT_SECRET);
     formData.append("grant_type", "authorization_code");
-    formData.append("redirect_uri", INSTAGRAM_REDIRECT_URI);
+    formData.append("redirect_uri", REDIRECT_URI);
     formData.append("code", code);
 
     const response = await axios.post(
