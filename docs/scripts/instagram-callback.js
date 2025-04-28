@@ -31,16 +31,16 @@
     }
 
     const result = await response.json();
-    statusEl.textContent = "Instagram account connected successfully!";
     usernameParagraph.hidden = false;
     userIdParagraph.hidden = false;
     tokenParagraph.hidden = false;
     connectedParagraph.hidden = false;
-
+    
     usernameParagraph.textContent = `Hello ${result.username}!`;
     connectedParagraph.textContent = `You can start using the features of Automafluxo`;
     userIdParagraph.textContent = `Your user ID is ${result.userId}.`;
-
+    
+    statusEl.textContent = "Instagram account connected successfully!";
 
     // Optional redirect after a few seconds:
     // setTimeout(() => window.location.href = '/dashboard', 3000);
