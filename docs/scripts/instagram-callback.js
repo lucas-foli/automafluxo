@@ -45,7 +45,7 @@
 
     usernameHeader.innerHTML = `Hello `;
     usernameHeader.append(img); // Append the image to the header
-    usernameHeader.innerHTML = `@${result.username}!`;
+    usernameHeader.innerHTML += `@${result.username}!`;
     
     connectedParagraph.textContent = `You can start using the features of Automafluxo`;
     userIdParagraph.textContent = `Your user ID is ${result.userId}.`;
