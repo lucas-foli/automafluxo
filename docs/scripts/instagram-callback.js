@@ -13,7 +13,7 @@
           ? "http://localhost:3000/api/instagram/initiate"
           : "https://api.automafluxo.com.br/api/instagram/initiate")
     );
-  }
+  };
 
   connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
   Processing...
