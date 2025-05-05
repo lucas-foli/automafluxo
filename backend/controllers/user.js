@@ -1,6 +1,6 @@
 import User from "../models/User.js";
 
-export const saveUserData = async ({ userId, name, token }) => {
+export const saveUserData = async ({ userId, name, token, profilePicUrl }) => {
   // const userId = "9164357020324792";
   // const token =
   //   "IGAAQLgGchM45BZAE1iWFVsSXB6WktibVVZAd00xM013WkdvdGJQOFlmWG9rY3hjdlZA5eDZAnLXNyTW8teVlZAUnl4bzlpdmFxMU9CZA3JiUnViN1VyU1F4MkVjaUZAoMTZAXQ0l2ZAUIxaTQ2bm54c1RtRXFpR3FR";
@@ -10,7 +10,7 @@ export const saveUserData = async ({ userId, name, token }) => {
     let user = await User.findOne({ userId });
 
     if (!user) {
-      user = new User({ userId, name, token });
+      user = new User({ userId, name, token, profilePictureUrl });
       await user.save();
       console.log("Usuário criado com sucesso:");
     } else {
