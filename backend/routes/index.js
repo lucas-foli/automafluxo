@@ -11,7 +11,8 @@ import {
   fetchAccountInsights,
   markHumanAgent,
   sendHumanAgentMessage,
-  getMediaId
+  getMediaId,
+  fetchUser
 } from "../controllers/instagramController.js";
 
 import {
@@ -23,7 +24,8 @@ const router = express.Router();
 
 router.get("/instagram/initiate", initiateInstagramFlow);
 router.get("/instagram/callback", getAccessToken);
-router.get("/instagram/delete-data", deleteUserData);
+router.get("/instagram/fetch-user-info", fetchUser);
+router.post("/instagram/delete", deleteUserData);
 router.get("/instagram/get-media", getMediaId);
 router.get("/instagram/fetch-comments", fetchComments);
 router.get("/instagram/reply-to-comment", replyToComment);

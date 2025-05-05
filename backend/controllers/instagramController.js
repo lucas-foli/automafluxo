@@ -1,7 +1,8 @@
-import { createHmac, timingSafeEqual } from "crypto";
 import axios from "axios";
 import dotenv from "dotenv";
 import { saveUserData } from "./user.js";
+import User from "../models/User.js";
+import { handleAxiosError } from "../../utils/error-handler.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
@@ -55,7 +56,7 @@ export const getAccessToken = async (req, res) => {
   } catch (error) {
     console.error("Failed to get short-lived access token:", error);
     const status = error.response ? error.response.status : 500;
-    return res.status(status).json({
+    res.status(status).json({
       error: "Failed to get access token from Instagram",
       details: error.message,
     });
@@ -85,6 +86,7 @@ export const getAccessToken = async (req, res) => {
       userId,
       name: username,
       token: longToken,
+      profilePictureUrl,
     });
     console.log("User saved successfully:", { user });
     console.log("User data saveUserData ", user.data);
@@ -118,26 +120,37 @@ const getLongAccessToken = async (token) => {
   }
 };
 
-export const deleteUserData = (req, res) => {
-  const { userId } = req.body;
+export const deleteUserData = async (req, res) => {
+  const { name } = req.body;
 
   try {
     // Aqui você deveria apagar o usuário do banco de dados
     // (Exemplo usando MongoDB ou outro, aqui é só mock)
 
-    console.log(`Deleting data for user: ${userId}`);
+    console.log(`Deleting data for user: ${name}`);
+    const res = await User.deleteOne({ name });
+    res.deletedCount === 0
+      ? console.log(`User ${name} not found`)
+      : console.log(`User ${name} deleted successfully`);
 
     // Simulação de exclusão
-    res.status(200).json({
-      message: `Data deletion requested for user ${userId}`,
-      code: 200,
-    });
+    return res;
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error deleting user data" });
   }
 };
 
+export const fetchUser = async (req, res) => {
+  try {
+    const user = await User.find({ name: req.query.username });
+
+    return res.json({ user: user[0] });
+  } catch (error) {
+    console.error("Error fetching user token:", error);
+    res.status(500).json({ error: "Error fetching user token" });
+  }
+};
 export const getUserData = async (token) => {
   try {
     const url = `https://graph.instagram.com/me?fields=id,username,profile_picture_url&access_token=${token}`;
@@ -155,34 +168,44 @@ export const getUserData = async (token) => {
   }
 };
 
-export const getMediaId = async (req) => {
-  const token =
-    "IGAAQLgGchM45BZAFBqTU1JaUNuYnJkLUVvbTNnNjZAMVDNuNmtyQnk2bHBfTVd6UDZACcV94dVc2N2RvMHRoSkJYWHl6MmFJdTJWcEtPNjFWTXZAOaE1Hb19NZAUdISjI3amRHWHI5ZAFdmU0ZAYbm9wUmxaT2ZA3";
+export const getMediaId = async (req, res) => {
+  const token = req.query.access_token;
+  const userId = req.query.userId;
+
+  if (!userId) {
+    throw new Error("User ID is missing");
+  }
   if (!token) {
     throw new Error("Access token is missing");
   }
+
   try {
     const mediaResponse = await axios.get(
-      `https://graph.instagram.com/v22.0/17841472479042560/media?access_token=${token}`
+      `https://graph.instagram.com/v22.0/${userId}/media?access_token=${token}`
     );
-    if (mediaResponse.status !== 200) {
-      throw new Error(`Error fetching media: ${mediaResponse.statusText}`);
-    }
-    const mediaId = mediaResponse.data.id;
-    return mediaId;
+
+    console.log("query:", mediaResponse.data.data[0]);
+
+    const mediaId = await mediaResponse.data.data[0].id;
+    return res.json({ mediaId });
   } catch (error) {
-    console.error("Error fetching media ID:", error);
-    throw error;
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching media ID" });
   }
 };
 // --- 2. instagram_business_manage_comments ---
 export const fetchComments = async (req, res) => {
   const accessToken = req.query.access_token;
-  const mediaId = await getMediaId(accessToken);
-  const response = await axios.get(
-    `https://graph.facebook.com/v22.0/${mediaId}/comments?access_token=${accessToken}`
-  );
-  return await response.json();
+  const mediaId = req.query.mediaId;
+  try {
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${mediaId}/comments?access_token=${accessToken}`
+    );
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching comments" });
+  }
 };
 
 export const replyToComment = async (commentId, message, accessToken) => {
