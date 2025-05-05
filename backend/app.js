@@ -67,8 +67,7 @@ app.use("/", express.static("docs"));
 // Monta as rotas da API
 app.use("/api", apiRoutes);
 
-app.use((req, res, next) => {
-  console.log(req.hostwname, req.originalUrl);    
+app.use((req, res, next) => { 
   const isRoot = req.hostnwame === "automafluxo.com.br";
   const isApi = req.originalUrl.startsWith("/api");
   const isStatic = req.originalUrl.startsWith("/assets");

@@ -86,8 +86,18 @@
     <p style="margin: 0; font-size: 16px; text-align: center;">
       You can start using the features of Automafluxo
     </p>
+    <p>
+        <a href="./dashboard.html?username=${result.username}">Go to dashboard</a>
+      </p>
   </div>
 `;
+
+    // <p style="margin: 0; font-size: 16px; text-align: center;">
+    //       Automatically redirecting you to the dashboard...
+    //     </p>
+    // setTimeout(() => {
+    //   window.location.href = `/dashboard?username=${result.username}`;
+    // }, 5000);
 
     // Optional redirect after a few seconds:
     // setTimeout(() => window.location.href = '/dashboard', 3000);
