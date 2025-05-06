@@ -54,9 +54,8 @@ export const getAccessToken = async (req, res) => {
     console.log("shortToken exchanged: ", shortToken);
     console.log("User data for short token ", response.data);
   } catch (error) {
-    console.error("Failed to get short-lived access token:", error);
-    const status = error.response ? error.response.status : 500;
-    res.status(status).json({
+    handleAxiosError(error);
+    return res.status(500).json({
       error: "Failed to get access token from Instagram",
       details: error.message,
     });
@@ -69,9 +68,8 @@ export const getAccessToken = async (req, res) => {
     console.log("token extended: ", longToken);
     console.log("User data for long token ", tokenResponse.data);
   } catch (error) {
-    console.error("Error getting long-lived token:", error);
-    const status = error.response ? error.response.status : 500;
-    return res.status(status).json({
+    handleAxiosError(error);
+    return res.status(500).json({
       error: "Failed to extend access token",
       details: error.message,
     });
@@ -91,7 +89,7 @@ export const getAccessToken = async (req, res) => {
     console.log("User saved successfully:", { user });
     console.log("User data saveUserData ", user.data);
   } catch (error) {
-    console.error("Error saving user data:", error);
+    handleAxiosError(error);
     return res.status(500).json({
       error: "Failed to save user data",
       details: error.message,
@@ -116,7 +114,8 @@ const getLongAccessToken = async (token) => {
     console.log("getLongAccessToken data", data);
     return data;
   } catch (error) {
-    console.error("Error fetching access token:", error);
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching access token" });
   }
 };
 
@@ -136,8 +135,8 @@ export const deleteUserData = async (req, res) => {
     // Simulação de exclusão
     return res;
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error deleting user data" });
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error deleting user data" });
   }
 };
 
@@ -147,8 +146,8 @@ export const fetchUser = async (req, res) => {
 
     return res.json({ user: user[0] });
   } catch (error) {
-    console.error("Error fetching user token:", error);
-    res.status(500).json({ error: "Error fetching user token" });
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching user token" });
   }
 };
 export const getUserData = async (token) => {
@@ -163,28 +162,27 @@ export const getUserData = async (token) => {
     };
     return userData;
   } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching user data" });
   }
 };
 
 export const getMediaId = async (req, res) => {
   const token = req.query.access_token;
   const userId = req.query.userId;
+  console.log("get-media:", userId, token);
 
   if (!userId) {
-    throw new Error("User ID is missing");
+    return res.status(400).json({ error: "User ID is missing" });
   }
   if (!token) {
-    throw new Error("Access token is missing");
+    return res.status(400).json({ error: "Access token is missing" });
   }
 
   try {
     const mediaResponse = await axios.get(
       `https://graph.instagram.com/v22.0/${userId}/media?access_token=${token}`
     );
-
-    console.log("query:", mediaResponse.data.data[0]);
 
     const mediaId = await mediaResponse.data.data[0].id;
     return res.json({ mediaId });
@@ -197,6 +195,7 @@ export const getMediaId = async (req, res) => {
 export const fetchComments = async (req, res) => {
   const accessToken = req.query.access_token;
   const mediaId = req.query.mediaId;
+  console.log("fetch-comments:", mediaId, accessToken);
   try {
     const response = await axios.get(
       `https://graph.instagram.com/v22.0/${mediaId}/comments?access_token=${accessToken}`
@@ -208,15 +207,53 @@ export const fetchComments = async (req, res) => {
   }
 };
 
-export const replyToComment = async (commentId, message, accessToken) => {
-  const response = await axios.post(
-    `https://graph.facebook.com/v22.0/${commentId}/replies?access_token=${accessToken}`,
-    {
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message }),
-    }
-  );
-  return await response.json();
+export const getCommentByID = async (req, res) => {
+  const { commentId, token } = req.query;
+  console.log("get-comment-by-id:", commentId, token);
+  try {
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${commentId}?fields=text,from&access_token=${token}`
+    );
+    console.log("get-comment-by-id response", response.data);
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching comment" });
+  }
+};
+
+export const replyToComment = async (req, res) => {
+  const { commentId, message, token } = req.query;
+  console.log("reply-comment:", commentId, message, token);
+
+  try {
+    let data = JSON.stringify({
+      message,
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `https://graph.instagram.com/v22.0/${commentId}/replies`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Cookie:
+          "csrftoken=5zNvUAXnInyk1KaJuxGfPcxIRH7O5JIQ; ig_did=6EC16D77-D2F8-4A1E-BBA1-02BC75873E8B; ig_nrcb=1; mid=Z-qtwwAEAAFJNstbQR-VLv38xsyG",
+      },
+      data: data,
+    };
+
+    const response = await axios.request(config);
+
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(error.response?.status || 500).json({
+      error: "Error replying to comment",
+      details: error.message,
+    });
+  }
 };
 
 // --- 3. instagram_business_manage_messages ---
@@ -246,8 +283,8 @@ export const fetchMessage = async (res, req) => {
     const data = await fbRes.json();
     res.json(data);
   } catch (error) {
-    console.error("Error replying message:", error);
-    res.status(500).json({ error: "Internal server error" });
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error replying message" });
   }
 };
 
@@ -269,8 +306,8 @@ export const replyToIGMessage = async (res, req) => {
     const data = await fbRes.json();
     res.json(data);
   } catch (error) {
-    console.error("Error replying message:", error);
-    res.status(500).json({ error: "Internal server error" });
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error replying message" });
   }
 };
 

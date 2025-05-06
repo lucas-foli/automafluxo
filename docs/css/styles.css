@@ -140,3 +140,19 @@ a {
   cursor: pointer;
   margin-top: 20px;
 }
+
+#replyArea {
+  align-content: center;
+}
+
+#send-reply {
+  background-color: rgb(10, 151, 0);
+  font-weight: bolder;
+  color: white;
+}
+
+.disable{
+  pointer-events: none;
+  opacity: 0.5;
+  background-color: #666;
+}

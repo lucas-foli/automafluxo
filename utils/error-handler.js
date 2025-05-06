@@ -5,6 +5,7 @@ export const handleAxiosError = (error) => {
       console.error("Status:", error.response.status);
       console.error("Message:", error.response.data?.error || error.response.statusText);
       console.error("Details:", JSON.stringify(error.response.data, null, 2));
+      error.config.data ?? console.error("Payload:", JSON.parse(error.config.data));
     } else if (error.request) {
       // Request was made but no response
       console.error("No response received from server.");
