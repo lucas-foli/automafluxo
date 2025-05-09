@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resultDiv = document.getElementById("result");
   const params = new URLSearchParams(window.location.search);
   const username = params.get("username");
+  const conversationList = document.getElementById("conversationList");
+  const messageList = document.getElementById("messageList");
 
   const sendReplyBtn = document.getElementById("send-reply");
 
@@ -74,8 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         option.textContent = `${getComment.data.from.username}: ${getComment.data.text}`;
         commentsList.appendChild(option);
       });
-    replyCommentBtn.classList.add("disable");
-
+      replyCommentBtn.classList.add("disable");
     }
     commentsArea.style.display = "block";
     const commentText = document.createElement("p");
@@ -88,7 +89,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   commentsList.addEventListener("change", async () => {
-
     commentsArea.style.display = "block";
     const commentText = document.createElement("p");
     commentText.textContent = `Comment: ${getComment.data.text}`;
@@ -160,6 +160,125 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (userIdField) {
       userIdField.value = igUserId;
     }
+  });
+  fetchMessagesBtn.addEventListener("click", async () => {
+    const fetchConversationsResponse = await fetch(
+      `/api/instagram/fetch-ig-conversations?userId=${userId}&token=${token}`
+    );
+    const fetchedData = await fetchConversationsResponse.json();
+    showResult(fetchedData.data.data);
+
+    const conversationList = document.getElementById("conversationList");
+    conversationList.innerHTML = "";
+    if (fetchedData.data.data) {
+      fetchedData.data.data.forEach((conversation) => {
+        const option = document.createElement("option");
+        option.value = conversation.id;
+        option.textContent = conversation.id;
+        conversationList.appendChild(option);
+      });
+    }
+    document.getElementById("messagesArea").style.display = "block";
+  });
+
+  conversationList.addEventListener("change", async () => {
+    const conversationId = conversationList.value;
+    const fetchMessagesResponse = await fetch(
+      `/api/instagram/fetch-message?conversation_id=${conversationId}&token=${token}`
+    );
+
+    const messagesData = await fetchMessagesResponse.json();
+
+    console.log("Messages:", messagesData);
+
+    const messageList = document.getElementById("messageList");
+    const messageTableBody = document.getElementById("messageTableBody");
+
+    messageList.innerHTML = "";
+    messageTableBody.innerHTML = "";
+
+    if (messagesData.data) {
+      messagesData.data.forEach((msg) => {
+        const option = document.createElement("option");
+        option.value = msg.from.id;
+        option.textContent = `${msg.from.username}: ${msg.message}`;
+        messageList.appendChild(option);
+
+        const tr = document.createElement("tr");
+
+        const tdFrom = document.createElement("td");
+        tdFrom.textContent = `${msg.from.username} (${msg.from.id})`;
+        tdFrom.style.padding = "4px";
+        tdFrom.style.fontSize = "15px";
+        tr.appendChild(tdFrom);
+
+        const tdTo = document.createElement("td");
+        tdTo.textContent = msg.to.data
+          .map((user) => `${user.username} (${user.id})`)
+          .join(", ");
+        tdTo.style.padding = "4px";
+        tdTo.style.fontSize = "15px";
+        tr.appendChild(tdTo);
+
+        const tdMessage = document.createElement("td");
+        tdMessage.textContent = msg.message;
+        tdMessage.style.padding = "4px";
+        tdMessage.style.fontSize = "15px";
+        tr.appendChild(tdMessage);
+
+        const tdTime = document.createElement("td");
+        tdTime.textContent = msg.created_time;
+        tdTime.style.padding = "4px";
+        tdTime.style.fontSize = "15px";
+        tr.appendChild(tdTime);
+
+        messageTableBody.appendChild(tr);
+      });
+    }
+
+    document.getElementById("messageDetailsArea").style.display = "block";
+  });
+  messageList.addEventListener("change", () => {
+    const replyArea = document.getElementById("replyArea");
+    const replyTextarea = document.getElementById("replyMessageText");
+    const selectedUserId = document.getElementById("messageList").value;
+    const selectedOption =
+      document.getElementById("messageList").selectedOptions[0];
+
+    if (selectedUserId) {
+      replyTextarea.value = ""; // limpa texto anterior
+      replyArea.style.display = "block";
+
+      // Mostrar nome do destinatário acima do textarea
+      const label = document.getElementById("replyRecipientLabel");
+      label.textContent = `Replying to: ${selectedOption.textContent}`;
+      label.style.display = "block";
+    } else {
+      replyArea.style.display = "none";
+      document.getElementById("replyRecipientLabel").style.display = "none";
+    }
+  });
+  sendReplyBtn.addEventListener("click", async () => {
+    console.log('username', username);
+    const recipientId = document.getElementById("messageList").value;
+    const messageText = document.getElementById("replyMessageText").value;
+    const res = await fetch(
+      `/api/instagram/reply-to-ig-message`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          token,
+          recipientId,
+          messageText,
+        }),
+      }
+    );
+
+    const data = await res.json();
+    console.log("Reply Result:", data);
+    showResult(data);
   });
 });
 

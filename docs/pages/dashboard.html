@@ -27,34 +27,13 @@
 
         <button id="fetch-comments">Fetch Comments</button>
         <button id="reply-comment">Reply to Comment</button>
-        <button id="fetch-messages" onclick="fetchMessages()">
+        <button id="fetch-messages">
           Fetch Messages
         </button>
         <div id="comments-area" style="margin-top: 20px; display: none">
           <h3>Comments Ids</h3>
           <select id="comments-list"></select>
         </div>
-        <!-- <button id="reply-messages" onclick="replyMessages()">
-      Reply to Message
-    </button> -->
-
-        <!-- <div id="messagesArea" style="margin-top: 20px; display: none">
-      <h3>Messages</h3>
-      <select
-        id="conversationList"
-        onchange="prepareReply()"
-        style="width: 300px"
-      ></select>
-      <br /><br />
-      <textarea
-        id="replyMessage"
-        rows="4"
-        cols="50"
-        placeholder="Type your reply here..."
-      ></textarea>
-      <br /><br />
-      <button onclick="sendReply()">Send Reply</button>
-    </div> -->
         <button id="human-agent" onclick="markHumanAgent()">
           Mark as Human Agent
         </button>
@@ -63,12 +42,11 @@
           <h3>Conversation Ids</h3>
           <select
             id="conversationList"
-            onchange="prepareReply()"
             style="width: 300px"
           ></select>
           <div id="messageDetailsArea" style="margin-top: 20px; display: none">
             <h3>Messages in Conversation</h3>
-            <select id="messageList" onchange="prepareRecipient()"></select>
+            <select id="messageList"></select>
             <table
               style="
                 width: 50%;
@@ -92,14 +70,6 @@
           <br /><br />
         </div>
         <br /><br />
-        <!-- <textarea
-        id="replyMessage"
-        rows="4"
-        cols="50"
-        placeholder="Type your reply here..."
-      ></textarea>
-      <br /><br />
-      <button onclick="sendReply()">Send Reply</button> -->
       </div>
       <button id="publish-content" onclick="publishContent()">
         Publish Photo
@@ -114,168 +84,6 @@
       </div>
 
       <script>
-        // async function replyToComment() {
-        //   const token = document.getElementById("accessToken").value;
-        //   const commentId = prompt("Enter Comment ID");
-        //   const message = prompt("Enter your reply");
-        //   const res = await fetch(
-        //     `https://graph.instagram.com/v22.0/${commentId}/replies?access_token=${token}`,
-        //     {
-        //       method: "POST",
-        //       headers: { "Content-Type": "application/json" },
-        //       body: JSON.stringify({ message }),
-        //     }
-        //   );
-        //   showResult(await res.json());
-        // }
-
-        async function fetchMessages() {
-          const token =
-            "IGAAQLgGchM45BZAE9ZAOW5JMUxBdVJqeWF5UG1RUFlaR1l0TzJGYmNWMVRHc0V2NThnQ1pUcVRON0thYXVDTmsyWDlENlJ2Rkd6c0haUDBhcF9ZAbUt5Q3BFS2JHckxuRjBET2tzZA1V0RXJBUXd5UFBVa2dn";
-          const pageId = "17841472479042560";
-          const res = await fetch(
-            `https://graph.instagram.com/v22.0/${pageId}/conversations?access_token=${token}`
-          );
-          const data = await res.json();
-          showResult(data);
-
-          const conversationList = document.getElementById("conversationList");
-          conversationList.innerHTML = "";
-          if (data.data) {
-            data.data.forEach((conversation) => {
-              const option = document.createElement("option");
-              option.value = conversation.id;
-              option.textContent = conversation.id;
-              conversationList.appendChild(option);
-            });
-          }
-          document.getElementById("messagesArea").style.display = "block";
-        }
-
-        async function prepareReply() {
-          const token = document.getElementById("accessToken").value;
-          const conversationId =
-            document.getElementById("conversationList").value;
-
-          const res = await fetch(
-            `https://graph.instagram.com/v22.0/${conversationId}/messages?fields=id,created_time,from,to,message&access_token=${token}`
-          );
-          const data = await res.json();
-
-          console.log("Messages:", data);
-
-          const messageList = document.getElementById("messageList");
-          const messageTableBody = document.getElementById("messageTableBody");
-
-          messageList.innerHTML = "";
-          messageTableBody.innerHTML = "";
-
-          if (data.data) {
-            data.data.forEach((msg) => {
-              const option = document.createElement("option");
-              option.value = msg.from.id;
-              option.textContent = `${msg.from.username}: ${msg.message}`;
-              messageList.appendChild(option);
-
-              const tr = document.createElement("tr");
-
-              const tdFrom = document.createElement("td");
-              tdFrom.textContent = `${msg.from.username} (${msg.from.id})`;
-              tdFrom.style.padding = "4px";
-              tdFrom.style.fontSize = "15px";
-              tr.appendChild(tdFrom);
-
-              const tdTo = document.createElement("td");
-              tdTo.textContent = msg.to.data
-                .map((user) => `${user.username} (${user.id})`)
-                .join(", ");
-              tdTo.style.padding = "4px";
-              tdTo.style.fontSize = "15px";
-              tr.appendChild(tdTo);
-
-              const tdMessage = document.createElement("td");
-              tdMessage.textContent = msg.message;
-              tdMessage.style.padding = "4px";
-              tdMessage.style.fontSize = "15px";
-              tr.appendChild(tdMessage);
-
-              const tdTime = document.createElement("td");
-              tdTime.textContent = msg.created_time;
-              tdTime.style.padding = "4px";
-              tdTime.style.fontSize = "15px";
-              tr.appendChild(tdTime);
-
-              messageTableBody.appendChild(tr);
-            });
-          }
-
-          document.getElementById("messageDetailsArea").style.display = "block";
-        }
-
-        function prepareRecipient() {
-          const replyArea = document.getElementById("replyArea");
-          const replyTextarea = document.getElementById("replyMessageText");
-          const selectedUserId = document.getElementById("messageList").value;
-          const selectedOption =
-            document.getElementById("messageList").selectedOptions[0];
-
-          if (selectedUserId) {
-            replyTextarea.value = ""; // limpa texto anterior
-            replyArea.style.display = "block";
-
-            // Mostrar nome do destinatário acima do textarea
-            const label = document.getElementById("replyRecipientLabel");
-            label.textContent = `Replying to: ${selectedOption.textContent}`;
-            label.style.display = "block";
-          } else {
-            replyArea.style.display = "none";
-            document.getElementById("replyRecipientLabel").style.display =
-              "none";
-          }
-        }
-
-        async function sendDirectReply() {
-          const token = document.getElementById("accessToken").value;
-          const igUserId = document.getElementById("userId").value; // seu Instagram Business ID
-          const recipientId = document.getElementById("messageList").value;
-          const messageText = document.getElementById("replyMessageText").value;
-          const conversationId =
-            document.getElementById("conversationList").value;
-
-          const res = await fetch(
-            `https://graph.instagram.com/v22.0/${igUserId}/messages?access_token=${token}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                recipient: { id: recipientId },
-                message: { text: messageText },
-              }),
-            }
-          );
-
-          const data = await res.json();
-          console.log("Reply Result:", data);
-          showResult(data);
-        }
-
-        async function replyMessages() {
-          const token = document.getElementById("accessToken").value;
-          const conversationId = prompt("Enter a Conversation ID to reply to");
-          const message = prompt("Enter your message");
-          const res = await fetch(
-            `localhost:3000/api/instagram/reply-to-ig-message?conversation_id=${conversationId}&access_token=${token}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                message_type: "RESPONSE",
-                message: message,
-              }),
-            }
-          );
-          showResult(await res.json());
-        }
 
         async function markHumanAgent() {
           const token = document.getElementById("accessToken").value;
@@ -327,16 +135,6 @@
           showResult(await res.json());
         }
 
-        //   async function sendReply() {
-        //     const token = document.getElementById("accessToken").value;
-        //     const conversationId =
-        //       document.getElementById("conversationList").value;
-        //     const message = document.getElementById("replyMessage").value;
-        //     const res = await fetch(
-        //       `http://localhost:3000/api/instagram/reply-to-ig-message?conversation_id=${conversationId}&access_token=${token}&message=${message}`
-        //     );
-        //     showResult(await res.json());
-        //   }
       </script>
     </div>
   </body>

@@ -258,53 +258,55 @@ export const replyToComment = async (req, res) => {
 
 // --- 3. instagram_business_manage_messages ---
 // Meta exige uso da API Messenger Platform com IG-linked Page ID
-export const fetchIGConversations = async (pageId, accessToken) => {
-  const response = await axios.get(
-    `https://graph.facebook.com/v22.0/${pageId}/conversations?platform=instagram&access_token=${accessToken}`
-  );
-  return await response.json();
-};
-
-export const fetchMessage = async (res, req) => {
-  const { conversation_id, access_token, message } = req.req.query;
+export const fetchIGConversations = async (req, res) => {
+  const { userId, token } = req.query;
 
   try {
-    const fbRes = await axios.post(
-      `https://graph.instagram.com/v22.0/${conversation_id}/messages?access_token=${access_token}&fields=message,from,to,created_time`,
-      {
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message_type: "RESPONSE",
-          message: message,
-        }),
-      }
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${userId}/conversations?platform=instagram&access_token=${token}`
     );
-
-    const data = await fbRes.json();
-    res.json(data);
+    return res.json({ data: response.data });
   } catch (error) {
     handleAxiosError(error);
-    return res.status(500).json({ error: "Error replying message" });
+    return res.status(error.response?.status || 500).json({
+      error: "Error replying to comment",
+      details: error.message,
+    });
   }
 };
 
-export const replyToIGMessage = async (res, req) => {
-  const { conversation_id, access_token, message } = req.req.query;
+export const fetchMessage = async (req, res) => {
+  const { conversation_id, token } = req.query;
 
   try {
+    const fbRes = await axios.get(
+      `https://graph.instagram.com/v22.0/${conversation_id}/messages?access_token=${token}&fields=message,from,to,created_time`
+    );
+    console.log(fbRes.data);
+    const data = await fbRes.data;
+    return res.json({ data: data.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching messages" });
+  }
+};
+
+export const replyToIGMessage = async (req, res) => {
+  const { userId, token, messageText, recipientId } = req.body;
+  console.log(userId, token, recipientId, messageText);
+  try {
     const fbRes = await axios.post(
-      `https://graph.instagram.com/v22.0/${conversation_id}/messages?access_token=${access_token}&fields=message,from,to,created_time`,
+      `https://graph.instagram.com/v22.0/${userId}/messages?access_token=${token}`,
+      {
+        recipient: { id: recipientId },
+        message: { text: messageText },
+      },
       {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message_type: "RESPONSE",
-          message: message,
-        }),
       }
     );
 
-    const data = await fbRes.json();
-    res.json(data);
+    return res.json(fbRes.data);
   } catch (error) {
     handleAxiosError(error);
     return res.status(500).json({ error: "Error replying message" });
