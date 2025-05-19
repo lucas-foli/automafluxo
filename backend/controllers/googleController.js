@@ -1,6 +1,6 @@
-const axios = require("axios");
-const qs = require("qs");
-const { saveUserData } = require("./user");
+import axios from "axios";
+import qs from "qs";
+import { saveGoogleUser } from "./user.js";
 
 export const getGoogleToken = async (req, res) => {
   const { code, state } = req.query;
@@ -25,7 +25,7 @@ export const getGoogleToken = async (req, res) => {
     const { access_token, refresh_token, expires_in } = response.data;
     console.log(response.data);
     // Salve esses tokens no seu banco junto com o WhatsApp do usuário (state)
-    await saveUserData({
+    await saveGoogleUser({
       whatsapp: state,
       accessToken: access_token,
       createdAt: refresh_token,
