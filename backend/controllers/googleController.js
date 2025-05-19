@@ -12,7 +12,7 @@ export const getGoogleToken = async (req, res) => {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: "https://automafluxo.com.br/pages/google-callback.html",
+        redirect_uri: "https://www.automafluxo.com.br/pages/google-callback.html",
         grant_type: "authorization_code",
       }),
       {
@@ -36,10 +36,10 @@ export const getGoogleToken = async (req, res) => {
       "✅ Autenticação concluída com sucesso. Você pode fechar essa aba."
     );
   } catch (error) {
-    console.error(
-      "Erro ao trocar código por token:",
-      error.response?.data || error
-    );
-    res.status(500).send("Erro ao autenticar com o Google.");
+    handleAxiosError(error);
+    return res.status(500).json({
+      error: "Erro ao trocar código por token:",
+      details: error.message,
+    });
   }
 };
