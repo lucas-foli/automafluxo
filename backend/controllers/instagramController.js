@@ -1,14 +1,14 @@
-import { createHmac, timingSafeEqual } from "crypto";
 import axios from "axios";
 import dotenv from "dotenv";
 import { saveUserData } from "./user.js";
+import User from "../models/User.js";
+import { handleAxiosError } from "../../utils/error-handler.js";
 dotenv.config();
 
 const INSTAGRAM_CLIENT_ID = process.env.INSTAGRAM_CLIENT_ID;
 const INSTAGRAM_REDIRECT_URI = process.env.INSTAGRAM_REDIRECT_URI;
 const INSTAGRAM_CLIENT_SECRET = process.env.INSTAGRAM_CLIENT_SECRET;
 const APP_SECRET = process.env.APP_SECRET;
-
 
 export const initiateInstagramFlow = async (req, res) => {
   const url =
@@ -54,9 +54,8 @@ export const getAccessToken = async (req, res) => {
     console.log("shortToken exchanged: ", shortToken);
     console.log("User data for short token ", response.data);
   } catch (error) {
-    console.error("Failed to get short-lived access token:", error);
-    const status = error.response ? error.response.status : 500;
-    return res.status(status).json({
+    handleAxiosError(error);
+    return res.status(500).json({
       error: "Failed to get access token from Instagram",
       details: error.message,
     });
@@ -69,16 +68,15 @@ export const getAccessToken = async (req, res) => {
     console.log("token extended: ", longToken);
     console.log("User data for long token ", tokenResponse.data);
   } catch (error) {
-    console.error("Error getting long-lived token:", error);
-    const status = error.response ? error.response.status : 500;
-    return res.status(status).json({
+    handleAxiosError(error);
+    return res.status(500).json({
       error: "Failed to extend access token",
       details: error.message,
     });
   }
 
   // 3. TODO: Get the username from token
-  const {username, profilePictureUrl} = await getUserData(longToken);
+  const { username, profilePictureUrl } = await getUserData(longToken);
 
   // 4. Save the user data to the database
   try {
@@ -86,20 +84,25 @@ export const getAccessToken = async (req, res) => {
       userId,
       name: username,
       token: longToken,
+      profilePictureUrl,
     });
     console.log("User saved successfully:", { user });
     console.log("User data saveUserData ", user.data);
   } catch (error) {
-    console.error("Error saving user data:", error);
+    handleAxiosError(error);
     return res.status(500).json({
       error: "Failed to save user data",
       details: error.message,
     });
   }
 
-  return res
-    .status(200)
-    .json({ message: "User successfully authenticated", userId, longToken, username, profilePictureUrl });
+  return res.status(200).json({
+    message: "User successfully authenticated",
+    userId,
+    longToken,
+    username,
+    profilePictureUrl,
+  });
 };
 
 const getLongAccessToken = async (token) => {
@@ -111,78 +114,45 @@ const getLongAccessToken = async (token) => {
     console.log("getLongAccessToken data", data);
     return data;
   } catch (error) {
-    console.error("Error fetching access token:", error);
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching access token" });
   }
 };
 
-export const deleteUserData = (req, res) => {
-  const signedRequest = req.body.signed_request;
-  const data = parseSignedRequest(signedRequest, APP_SECRET);
-
-  if (!data) {
-    return res.status(400).json({ error: "Invalid signed request" });
-  }
+export const deleteUserData = async (req, res) => {
+  const { name } = req.body;
 
   try {
-    const confirmationCode = Math.floor(
-      100000 + Math.random() * 900000
-    ).toString(); // Gere um código único, por exemplo
-    const statusUrl =
-      "https://www.automafluxo.com.br/api/instagram/delete-data?id=" +
-      confirmationCode;
-    return res.json({
-      url: statusUrl,
-      confirmation_code: confirmationCode,
-    });
-  } catch (err) {
-    console.error("Erro ao excluir dados:", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    // Aqui você deveria apagar o usuário do banco de dados
+    // (Exemplo usando MongoDB ou outro, aqui é só mock)
+
+    console.log(`Deleting data for user: ${name}`);
+    const result = await User.deleteOne({ name });
+    result.deletedCount === 0
+      ? console.log(`User ${name} not found`)
+      : console.log(`User ${name} deleted successfully`);
+
+    // Simulação de exclusão
+    return result;
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error deleting user data" });
   }
 };
 
+export const fetchUser = async (req, res) => {
+  try {
+    const user = await User.find({ name: req.query.username });
 
-/**
- * Função para decodificar strings em Base64 URL-safe
- */
-function base64UrlDecode(str) {
-  // Substitui '-' por '+' e '_' por '/' e adiciona padding se necessário
-  let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
-  while (base64.length % 4) {
-    base64 += "=";
+    return res.json({ user: user[0] });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching user token" });
   }
-  return Buffer.from(base64, "base64").toString("utf8");
-}
-
-/**
- * Função para analisar o signed_request
- */
-function parseSignedRequest(signedRequest, appSecret) {
-  if (!signedRequest) return null;
-
-  const [encodedSig, payload] = signedRequest.split(".", 2);
-  if (!encodedSig || !payload) return null;
-
-  // Decodifica a assinatura e o payload
-  const sig = Buffer.from(
-    encodedSig.replace(/-/g, "+").replace(/_/g, "/"),
-    "base64"
-  );
-  const data = JSON.parse(base64UrlDecode(payload));
-
-  // Calcula a assinatura esperada usando HMAC-SHA256 com o app secret
-  const expectedSig = createHmac("sha256", appSecret).update(payload).digest();
-
-  // Compara as assinaturas de forma segura
-  if (!timingSafeEqual(sig, expectedSig)) {
-    console.error("Bad Signed JSON signature!");
-    return null;
-  }
-  return data;
-}
-
+};
 export const getUserData = async (token) => {
   try {
-    const url = `https://graph.instagram.com/me?fields=username,profile_picture_url&access_token=${token}`;
+    const url = `https://graph.instagram.com/me?fields=id,username,profile_picture_url&access_token=${token}`;
     const response = await axios.get(url);
     const username = await response.data.username;
     const profilePictureUrl = await response.data.profile_picture_url;
@@ -192,7 +162,215 @@ export const getUserData = async (token) => {
     };
     return userData;
   } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching user data" });
   }
+};
+
+export const getMediaId = async (req, res) => {
+  const token = req.query.access_token;
+  const userId = req.query.userId;
+  console.log("get-media:", userId, token);
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is missing" });
+  }
+  if (!token) {
+    return res.status(400).json({ error: "Access token is missing" });
+  }
+
+  try {
+    const mediaResponse = await axios.get(
+      `https://graph.instagram.com/v22.0/${userId}/media?access_token=${token}`
+    );
+
+    const mediaId = await mediaResponse.data.data[0].id;
+    return res.json({ mediaId });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching media ID" });
+  }
+};
+// --- 2. instagram_business_manage_comments ---
+export const fetchComments = async (req, res) => {
+  const accessToken = req.query.access_token;
+  const mediaId = req.query.mediaId;
+  console.log("fetch-comments:", mediaId, accessToken);
+  try {
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${mediaId}/comments?access_token=${accessToken}`
+    );
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching comments" });
+  }
+};
+
+export const getCommentByID = async (req, res) => {
+  const { commentId, token } = req.query;
+  console.log("get-comment-by-id:", commentId, token);
+  try {
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${commentId}?fields=text,from&access_token=${token}`
+    );
+    console.log("get-comment-by-id response", response.data);
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching comment" });
+  }
+};
+
+export const replyToComment = async (req, res) => {
+  const { commentId, message, token } = req.query;
+  console.log("reply-comment:", commentId, message, token);
+
+  try {
+    let data = JSON.stringify({
+      message,
+    });
+
+    let config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: `https://graph.instagram.com/v22.0/${commentId}/replies`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Cookie:
+          "csrftoken=5zNvUAXnInyk1KaJuxGfPcxIRH7O5JIQ; ig_did=6EC16D77-D2F8-4A1E-BBA1-02BC75873E8B; ig_nrcb=1; mid=Z-qtwwAEAAFJNstbQR-VLv38xsyG",
+      },
+      data: data,
+    };
+
+    const response = await axios.request(config);
+
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(error.response?.status || 500).json({
+      error: "Error replying to comment",
+      details: error.message,
+    });
+  }
+};
+
+// --- 3. instagram_business_manage_messages ---
+// Meta exige uso da API Messenger Platform com IG-linked Page ID
+export const fetchIGConversations = async (req, res) => {
+  const { userId, token } = req.query;
+
+  try {
+    const response = await axios.get(
+      `https://graph.instagram.com/v22.0/${userId}/conversations?platform=instagram&access_token=${token}`
+    );
+    return res.json({ data: response.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(error.response?.status || 500).json({
+      error: "Error replying to comment",
+      details: error.message,
+    });
+  }
+};
+
+export const fetchMessage = async (req, res) => {
+  const { conversation_id, token } = req.query;
+
+  try {
+    const fbRes = await axios.get(
+      `https://graph.instagram.com/v22.0/${conversation_id}/messages?access_token=${token}&fields=message,from,to,created_time`
+    );
+    console.log(fbRes.data);
+    const data = await fbRes.data;
+    return res.json({ data: data.data });
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error fetching messages" });
+  }
+};
+
+export const replyToIGMessage = async (req, res) => {
+  const { userId, token, messageText, recipientId } = req.body;
+  console.log(userId, token, recipientId, messageText);
+  try {
+    const fbRes = await axios.post(
+      `https://graph.instagram.com/v22.0/${userId}/messages?access_token=${token}`,
+      {
+        recipient: { id: recipientId },
+        message: { text: messageText },
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    return res.json(fbRes.data);
+  } catch (error) {
+    handleAxiosError(error);
+    return res.status(500).json({ error: "Error replying message" });
+  }
+};
+
+// --- 4. instagram_business_content_publish ---
+export const publishIGPhoto = async (
+  imageUrl,
+  caption,
+  igUserId,
+  accessToken
+) => {
+  const container = await axios.post(
+    `https://graph.facebook.com/v22.0/${igUserId}/media?image_url=${encodeURIComponent(
+      imageUrl
+    )}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`
+  );
+  const { id: containerId } = container.data;
+
+  const publish = await axios.post(
+    `https://graph.facebook.com/v22.0/${igUserId}/media_publish?creation_id=${containerId}&access_token=${accessToken}`
+  );
+  return publish.data;
+};
+
+// --- 5. instagram_business_manage_insights ---
+export const fetchAccountInsights = async (igUserId, accessToken) => {
+  const response = await axios.get(
+    `https://graph.facebook.com/v22.0/${igUserId}/insights?metric=impressions,reach,profile_views&period=day&access_token=${accessToken}`
+  );
+  return await response.json();
+};
+
+export const fetchPostInsights = async (mediaId, accessToken) => {
+  const response = await axios.get(
+    `https://graph.facebook.com/v22.0/${mediaId}/insights?metric=impressions,reach,saved,engagement&access_token=${accessToken}`
+  );
+  return await response.json();
+};
+
+// --- 6. pages_messaging + human_agent (Messenger) ---
+export const markHumanAgent = async (conversationId, accessToken) => {
+  const conversations = await axios.post(
+    `https://graph.facebook.com/v22.0/${conversationId}/pass_thread_control?access_token=${accessToken}`,
+    {
+      headers: { "Content-Type": "application/json" },
+      data: JSON.stringify({ target_app_id: 263902037430900 }), // Human Agent ID
+    }
+  );
+  return conversations.json();
+};
+
+export const sendHumanAgentMessage = async (
+  conversationId,
+  message,
+  accessToken
+) => {
+  const messagesData = await axios.post(
+    `https://graph.facebook.com/v22.0/${conversationId}/messages?access_token=${accessToken}`,
+    {
+      headers: { "Content-Type": "application/json" },
+      data: JSON.stringify({ message_type: "RESPONSE", message }),
+    }
+  );
+  return messagesData.json();
 };

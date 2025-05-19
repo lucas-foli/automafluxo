@@ -13,7 +13,7 @@
           ? "http://localhost:3000/api/instagram/initiate"
           : "https://api.automafluxo.com.br/api/instagram/initiate")
     );
-  }
+  };
 
   connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
   Processing...
@@ -86,8 +86,18 @@
     <p style="margin: 0; font-size: 16px; text-align: center;">
       You can start using the features of Automafluxo
     </p>
+    <p>
+        <a href="./dashboard.html?username=${result.username}">Go to dashboard</a>
+      </p>
   </div>
 `;
+
+    // <p style="margin: 0; font-size: 16px; text-align: center;">
+    //       Automatically redirecting you to the dashboard...
+    //     </p>
+    // setTimeout(() => {
+    //   window.location.href = `/dashboard?username=${result.username}`;
+    // }, 5000);
 
     // Optional redirect after a few seconds:
     // setTimeout(() => window.location.href = '/dashboard', 3000);

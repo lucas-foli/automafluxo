@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram Dashboard</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <script src="../scripts/instagram-dashboard.js"></script>
+  </head>
+  <body>
+    <div class="hero">
+      <h1>Instagram Dashboard</h1>
+
+      <div class="user-info" id="user-info"></div>
+      <br /><br />
+
+      <div id="replyArea">
+        <textarea
+          id="replyMessageText"
+          rows="4"
+          cols="50"
+          placeholder="Type your reply here..."
+        ></textarea>
+        <div id="replyRecipientLabel"></div>
+        <button id="send-reply" class="disable" disabled>
+          Send Direct Reply
+        </button>
+        <br /><br />
+
+        <button id="fetch-comments">Fetch Comments</button>
+        <button id="reply-comment">Reply to Comment</button>
+        <button id="fetch-messages">Fetch Messages</button>
+        <div id="comments-area" style="margin-top: 20px; display: none">
+          <h3>Comments Ids</h3>
+          <select id="comments-list"></select>
+        </div>
+        <button id="human-agent" onclick="markHumanAgent()">
+          Mark as Human Agent
+        </button>
+
+        <div id="messagesArea" style="margin-top: 20px; display: none">
+          <h3>Conversation Ids</h3>
+          <select id="conversationList" style="width: 300px"></select>
+          <div id="messageDetailsArea" style="margin-top: 20px; display: none">
+            <h3>Messages in Conversation</h3>
+            <select id="messageList"></select>
+            <div class="responsive-table-container">
+              <table class="responsive-table"
+                style="
+                  width: 50%;
+                  margin-top: 20px;
+                  border-collapse: collapse;
+                  font-size: 15px;
+                "
+                border="1"
+              >
+                <thead>
+                  <tr>
+                    <th style="padding: 10px">From</th>
+                    <th style="padding: 10px">To</th>
+                    <th style="padding: 10px">Msg</th>
+                    <th style="padding: 10px">Time</th>
+                  </tr>
+                </thead>
+                <tbody id="messageTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <br /><br />
+        </div>
+        <br /><br />
+      </div>
+      <button id="publish-content" onclick="publishContent()">
+        Publish Photo
+      </button>
+      <button id="fetch-insights" onclick="fetchInsights()">
+        Fetch Insights
+      </button>
+      <button id="get-ig-user-id">Get IG Business Account ID</button>
+      <div style="margin-top: 20px">
+        <h3>Result:</h3>
+        <pre id="result"></pre>
+      </div>
+
+      <script>
+        async function markHumanAgent() {
+          const token = document.getElementById("accessToken").value;
+          const conversationId =
+            document.getElementById("conversationList").value;
+          return await fetch(
+            `https://graph.instagram.com/v22.0/${conversationId}/pass_thread_control?access_token=${token}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                target_app_id: 263902037430900, // ID fixo do Human Agent da Meta
+              }),
+            }
+          ).then((res) => {
+            showResult(res.json());
+          });
+        }
+
+        async function publishContent() {
+          const token = document.getElementById("accessToken").value;
+          const igUserId = prompt("Enter IG User ID");
+          const imageUrl = prompt("Enter Image URL");
+          const caption = prompt("Enter Caption");
+          const containerRes = await fetch(
+            `https://graph.instagram.com/v22.0/${igUserId}/media?image_url=${encodeURIComponent(
+              imageUrl
+            )}&caption=${encodeURIComponent(caption)}&access_token=${token}`,
+            {
+              method: "POST",
+            }
+          );
+          const containerData = await containerRes.json();
+          const publishRes = await fetch(
+            `https://graph.instagram.com/v22.0/${igUserId}/media_publish?creation_id=${containerData.id}&access_token=${token}`,
+            {
+              method: "POST",
+            }
+          );
+          showResult(await publishRes.json());
+        }
+
+        async function fetchInsights() {
+          const token = document.getElementById("accessToken").value;
+          const igUserId = prompt("Enter IG User ID");
+          const res = await fetch(
+            `https://graph.instagram.com/v22.0/${igUserId}/insights?metric=impressions,reach,profile_views&period=day&access_token=${token}`
+          );
+          showResult(await res.json());
+        }
+      </script>
+    </div>
+  </body>
+</html>
