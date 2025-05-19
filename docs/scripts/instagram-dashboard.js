@@ -166,7 +166,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       `/api/instagram/fetch-ig-conversations?userId=${userId}&token=${token}`
     );
     const fetchedData = await fetchConversationsResponse.json();
-    showResult(fetchedData.data.data);
 
     const conversationList = document.getElementById("conversationList");
     conversationList.innerHTML = "";
@@ -278,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const data = await res.json();
     console.log("Reply Result:", data);
-    showResult(data);
+    alert('message sent succesfully', JSON.stringify(data));
   });
 });
 

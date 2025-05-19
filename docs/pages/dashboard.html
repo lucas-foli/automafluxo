@@ -16,20 +16,20 @@
 
       <div id="replyArea">
         <textarea
-        id="replyMessageText"
-        rows="4"
-        cols="50"
-        placeholder="Type your reply here..."
+          id="replyMessageText"
+          rows="4"
+          cols="50"
+          placeholder="Type your reply here..."
         ></textarea>
         <div id="replyRecipientLabel"></div>
-        <button id="send-reply" class='disable' disabled>Send Direct Reply</button>
+        <button id="send-reply" class="disable" disabled>
+          Send Direct Reply
+        </button>
         <br /><br />
 
         <button id="fetch-comments">Fetch Comments</button>
         <button id="reply-comment">Reply to Comment</button>
-        <button id="fetch-messages">
-          Fetch Messages
-        </button>
+        <button id="fetch-messages">Fetch Messages</button>
         <div id="comments-area" style="margin-top: 20px; display: none">
           <h3>Comments Ids</h3>
           <select id="comments-list"></select>
@@ -40,32 +40,31 @@
 
         <div id="messagesArea" style="margin-top: 20px; display: none">
           <h3>Conversation Ids</h3>
-          <select
-            id="conversationList"
-            style="width: 300px"
-          ></select>
+          <select id="conversationList" style="width: 300px"></select>
           <div id="messageDetailsArea" style="margin-top: 20px; display: none">
             <h3>Messages in Conversation</h3>
             <select id="messageList"></select>
-            <table
-              style="
-                width: 50%;
-                margin-top: 20px;
-                border-collapse: collapse;
-                font-size: 15px;
-              "
-              border="1"
-            >
-              <thead>
-                <tr>
-                  <th style="padding: 10px">From</th>
-                  <th style="padding: 10px">To</th>
-                  <th style="padding: 10px">Msg</th>
-                  <th style="padding: 10px">Time</th>
-                </tr>
-              </thead>
-              <tbody id="messageTableBody"></tbody>
-            </table>
+            <div class="responsive-table-container">
+              <table class="responsive-table"
+                style="
+                  width: 50%;
+                  margin-top: 20px;
+                  border-collapse: collapse;
+                  font-size: 15px;
+                "
+                border="1"
+              >
+                <thead>
+                  <tr>
+                    <th style="padding: 10px">From</th>
+                    <th style="padding: 10px">To</th>
+                    <th style="padding: 10px">Msg</th>
+                    <th style="padding: 10px">Time</th>
+                  </tr>
+                </thead>
+                <tbody id="messageTableBody"></tbody>
+              </table>
+            </div>
           </div>
           <br /><br />
         </div>
@@ -84,7 +83,6 @@
       </div>
 
       <script>
-
         async function markHumanAgent() {
           const token = document.getElementById("accessToken").value;
           const conversationId =
@@ -134,7 +132,6 @@
           );
           showResult(await res.json());
         }
-
       </script>
     </div>
   </body>
