@@ -21,12 +21,12 @@
     Código não recebido
   </p>`;
     loginButton.hidden = false;
-    loginHandler();
+    // loginHandler();
     return;
   }
 
   try {
-    const response = await fetch(`/api/google/auth?code=${code}&state=${state}`);
+    const response = await fetch(`https://api.automafluxo.com.br/api/google/auth?code=${code}&state=${state}`);
 
     if (!response.ok) {
       const error = await response.json();
@@ -34,7 +34,7 @@
       Failed to connect: ${error.message || "Unknown error"};
     </p>`;
       loginButton.hidden = false;
-      loginHandler();
+      // loginHandler();
 
       return;
     }
@@ -93,6 +93,6 @@
   } catch (error) {
     connectionResult.textContent = "Something went wrong: " + error.message;
     loginButton.hidden = false;
-    loginHandler();
+    // loginHandler();
   }
 })();
