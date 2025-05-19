@@ -25,3 +25,30 @@ export const saveUserData = async ({ userId, name, token, profilePicUrl }) => {
     throw error;
   }
 };
+
+export const saveGoogleUser = async ({
+  whatsapp,
+  accessToken,
+  createdAt,
+  expiresIn,
+}) => {
+  try {
+    // Verifica se o usuário já existe no banco de dados
+    let user = await User.findOne({ whatsapp });
+
+    if (!user) {
+      user = new User({ whatsapp, accessToken, createdAt, expiresIn });
+      await user.save();
+      console.log("Usuário criado com sucesso:");
+    } else {
+      user.whatsapp = whatsapp;
+      user.accessToken = accessToken;
+      await user.save();
+      console.log("Usuário atualizado com sucesso:");
+    }
+    return user;
+  } catch (error) {
+    console.error("Erro ao salvar usuário:", error);
+    throw error;
+  }
+};

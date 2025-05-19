@@ -21,6 +21,7 @@ import {
   initiateFbLogin,
   getFbAccessToken,
 } from "../controllers/fbController.js";
+import { getGoogleToken } from "../controllers/googleController.js";
 
 const router = express.Router();
 
@@ -41,6 +42,7 @@ router.get("/instagram/send-human-agent-message", sendHumanAgentMessage);
 router.post("/instagram/reply-comment", replyToComment);
 router.get("/facebook/login", initiateFbLogin);
 router.get("/facebook/callback", getFbAccessToken);
+router.get("/google/auth", getGoogleToken);
 // router.get("/whatsapp/fetch", fetchWppMessages);
 
 export default router;
