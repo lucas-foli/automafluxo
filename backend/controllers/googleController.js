@@ -12,7 +12,7 @@ export const getGoogleToken = async (req, res) => {
         code,
         client_id: process.env.GOOGLE_CLIENT_ID,
         client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: "https://www.automafluxo.com.br/pages/google-callback.html",
+        redirect_uri: "https://automafluxo.com.br/pages/google-callback.html",
         grant_type: "authorization_code",
       }),
       {
