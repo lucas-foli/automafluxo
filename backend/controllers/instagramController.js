@@ -127,13 +127,13 @@ export const deleteUserData = async (req, res) => {
     // (Exemplo usando MongoDB ou outro, aqui é só mock)
 
     console.log(`Deleting data for user: ${name}`);
-    const res = await User.deleteOne({ name });
-    res.deletedCount === 0
+    const result = await User.deleteOne({ name });
+    result.deletedCount === 0
       ? console.log(`User ${name} not found`)
       : console.log(`User ${name} deleted successfully`);
 
     // Simulação de exclusão
-    return res;
+    return result;
   } catch (error) {
     handleAxiosError(error);
     return res.status(500).json({ error: "Error deleting user data" });
@@ -325,12 +325,12 @@ export const publishIGPhoto = async (
       imageUrl
     )}&caption=${encodeURIComponent(caption)}&access_token=${accessToken}`
   );
-  const { id: containerId } = await container.json();
+  const { id: containerId } = container.data;
 
   const publish = await axios.post(
     `https://graph.facebook.com/v22.0/${igUserId}/media_publish?creation_id=${containerId}&access_token=${accessToken}`
   );
-  return await publish.json();
+  return publish.data;
 };
 
 // --- 5. instagram_business_manage_insights ---
@@ -354,7 +354,7 @@ export const markHumanAgent = async (conversationId, accessToken) => {
     `https://graph.facebook.com/v22.0/${conversationId}/pass_thread_control?access_token=${accessToken}`,
     {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ target_app_id: 263902037430900 }), // Human Agent ID
+      data: JSON.stringify({ target_app_id: 263902037430900 }), // Human Agent ID
     }
   );
   return conversations.json();
@@ -369,7 +369,7 @@ export const sendHumanAgentMessage = async (
     `https://graph.facebook.com/v22.0/${conversationId}/messages?access_token=${accessToken}`,
     {
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message_type: "RESPONSE", message }),
+      data: JSON.stringify({ message_type: "RESPONSE", message }),
     }
   );
   return messagesData.json();
