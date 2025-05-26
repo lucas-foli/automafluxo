@@ -47,6 +47,7 @@ export const saveGoogleUser = async ({
       user.accessToken = accessToken;
       user.refreshToken = refreshToken;
       user.createdAt = createdAt;
+      user.expiresIn = expiresIn;
       await user.save();
       console.log("Usuário atualizado com sucesso:");
       console.log(user);

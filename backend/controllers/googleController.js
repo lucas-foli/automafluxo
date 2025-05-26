@@ -16,7 +16,10 @@ export const exchangeToken = async (req, res) => {
       whatsapp,
       accessToken: access_token,
       refreshToken: refresh_token,
-      expiresIn: expires_in,
+      expiresIn: {
+        timestamp: expires_in,
+        dateString: new Date(Date.now() + expires_in * 1000),
+      },
     });
 
     res.send(
@@ -83,8 +86,10 @@ export const getGoogleToken = async (req, res) => {
     return res.status(404).json({ error: "Usuário não encontrado" });
   }
 
+  console.log("User found:", user);
+
   const now = Date.now();
-  const expiration = user.expires_at; // salvar isso ao obter token
+  const expiration = user.expiresIn; // salvar isso ao obter token
   const isValid = expiration && now < expiration - 60000;
 
   if (isValid) {
@@ -93,6 +98,7 @@ export const getGoogleToken = async (req, res) => {
 
   try {
     const refreshed = await refreshAccessToken(user.refreshToken);
+    console.log("Refreshed token:", refreshed);
 
     await saveGoogleUser({
       whatsapp,
