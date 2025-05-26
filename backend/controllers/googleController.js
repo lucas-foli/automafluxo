@@ -47,6 +47,7 @@ export const exchangeCodeForTokens = async (code, redirectUri) => {
       },
     }
   );
+  console.log("Response from Google token exchange:", response.data);
   return response.data;
 };
 
@@ -80,7 +81,7 @@ export const refreshAccessToken = async (refreshToken) => {
         },
       }
     );
-
+    console.log("Response from Google token refresh:", response.data);
     return response.data; // contém: access_token, expires_in, scope, token_type
   } catch (error) {
     handleAxiosError(error);

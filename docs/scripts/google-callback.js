@@ -42,7 +42,7 @@
       return;
     }
 
-    const result = await response.json();
+    console.log("Response from Google authentication:", response);
     connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
     Autenticado! Redirecionando ao WhatsApp...
   </p>`;
