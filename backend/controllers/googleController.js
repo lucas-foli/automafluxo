@@ -17,7 +17,7 @@ export const exchangeToken = async (req, res) => {
       accessToken: access_token,
       refreshToken: refresh_token,
       expiresIn: {
-        timestamp: expires_in * 1000,
+        timestamp: expires_in,
         dateString: new Date(Date.now() + expires_in * 1000),
       },
     });
@@ -88,9 +88,9 @@ export const getGoogleToken = async (req, res) => {
 
   console.log("User found:", user);
 
-  const now = Date.now();
-  const expiration = user.expiresIn; // salvar isso ao obter token
-  const isValid = expiration && now < expiration - 60000;
+  const now = Date.now().valueOf();
+  const expiration = user.expiresIn.timestamp; // salvar isso ao obter token
+  const isValid = now < Date.now().valueOf() + expiration;
 
   console.log('expiration', expiration);
   console.log('isValid', isValid);
