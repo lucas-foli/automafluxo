@@ -12,7 +12,7 @@ export const exchangeToken = async (req, res) => {
     const { access_token, refresh_token, expires_in } =
       await exchangeCodeForTokens(code, redirectUri);
 
-    await storeGoogleTokens({
+    await saveGoogleUser({
       whatsapp,
       accessToken: access_token,
       refreshToken: refresh_token,
@@ -49,20 +49,6 @@ export const exchangeCodeForTokens = async (code, redirectUri) => {
   );
   console.log("Response from Google token exchange:", response.data);
   return response.data;
-};
-
-export const storeGoogleTokens = async ({
-  whatsapp,
-  accessToken,
-  refreshToken,
-  expiresIn,
-}) => {
-  await saveGoogleUser({
-    whatsapp,
-    accessToken,
-    refreshToken,
-    expiresIn,
-  });
 };
 
 export const refreshAccessToken = async (refreshToken) => {
@@ -106,7 +92,7 @@ export const getGoogleToken = async (req, res) => {
   }
 
   try {
-    const refreshed = await refreshAccessToken(user.refresh_token);
+    const refreshed = await refreshAccessToken(user.refreshToken);
 
     await saveGoogleUser({
       whatsapp,

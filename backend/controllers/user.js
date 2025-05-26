@@ -49,6 +49,7 @@ export const saveGoogleUser = async ({
       user.createdAt = createdAt;
       await user.save();
       console.log("Usuário atualizado com sucesso:");
+      console.log(user);
     }
     return user;
   } catch (error) {
