@@ -27,7 +27,9 @@
   }
 
   try {
-    const response = await fetch(`https://api.automafluxo.com.br/api/google/auth?code=${code}&state=${state}`);
+    const response = await fetch(
+      `https://api.automafluxo.com.br/api/google/auth?code=${code}&state=${state}`
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -41,56 +43,11 @@
     }
 
     const result = await response.json();
-    console.log(result)
+    connectionResult.innerHTML = `<p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
+    Autenticado! Redirecionando ao WhatsApp...
+  </p>`;
 
-//     connectionHeader.innerHTML = `
-//     <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
-//       Welcome
-//       <img src="${result.profilePictureUrl}" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
-//         @${result.username}!
-//     </p>`;
-//     connectionResult.innerHTML = `
-//   <div style="
-//     background: rgba(0, 0, 0, 0.7);
-//     padding: 20px;
-//     border-radius: 10px;
-//     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-//     max-width: 400px;
-//     margin: auto;
-//     text-align: left;
-//     color: #fff;
-//   ">
-//     <p style="margin-bottom: 16px; font-size: 18px; font-weight: bold; text-align: center;">
-//       Instagram account connected successfully!
-//     </p>
-//     <ul style="list-style: none; padding: 0; margin: 0 0 16px 0;">
-//       <li style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
-//         <strong>Username:</strong> 
-//         <img src="${result.profilePictureUrl}" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
-//         @${result.username}
-//       </li>
-//       <li style="margin-bottom: 10px;">
-//         <strong>User ID:</strong> ${result.userId}
-//       </li>
-//     </ul>
-//     <p style="margin: 0; font-size: 16px; text-align: center;">
-//       You can start using the features of Automafluxo
-//     </p>
-//     <p>
-//         <a href="./dashboard.html?username=${result.username}">Go to dashboard</a>
-//       </p>
-//   </div>
-// `;
-
-    // <p style="margin: 0; font-size: 16px; text-align: center;">
-    //       Automatically redirecting you to the dashboard...
-    //     </p>
-    // setTimeout(() => {
-    //   window.location.href = `/dashboard?username=${result.username}`;
-    // }, 5000);
-
-    // Optional redirect after a few seconds:
-    // setTimeout(() => window.location.href = '/dashboard', 3000);
+    setTimeout(() => (window.location.href = "https://api.whatsapp.com/send?phone=551152862523&text=Conectado%20no%20Google%20"), 3000);
   } catch (error) {
     connectionResult.textContent = "Something went wrong: " + error.message;
     loginButton.hidden = false;
