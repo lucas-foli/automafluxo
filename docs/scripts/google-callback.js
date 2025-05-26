@@ -5,6 +5,7 @@
   const params = new URLSearchParams(window.location.search);
   const state = params.get("state");
   const code = params.get("code");
+  const isLocal = params.get("local");
 
   // const loginHandler = () => {
   //   loginButton.addEventListener(

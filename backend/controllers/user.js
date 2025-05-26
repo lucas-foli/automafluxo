@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import GoogleUser from "../models/GoogleUser.js";
 
 export const saveUserData = async ({ userId, name, token, profilePicUrl }) => {
   // const userId = "9164357020324792";
@@ -29,20 +30,23 @@ export const saveUserData = async ({ userId, name, token, profilePicUrl }) => {
 export const saveGoogleUser = async ({
   whatsapp,
   accessToken,
+  refreshToken,
   createdAt,
   expiresIn,
 }) => {
   try {
     // Verifica se o usuário já existe no banco de dados
-    let user = await User.findOne({ whatsapp });
+    let user = await GoogleUser.findOne({ whatsapp });
 
     if (!user) {
-      user = new User({ whatsapp, accessToken, createdAt, expiresIn });
+      user = new GoogleUser({ whatsapp, accessToken, createdAt, expiresIn });
       await user.save();
       console.log("Usuário criado com sucesso:");
     } else {
       user.whatsapp = whatsapp;
       user.accessToken = accessToken;
+      user.refreshToken = refreshToken;
+      user.createdAt = createdAt;
       await user.save();
       console.log("Usuário atualizado com sucesso:");
     }
