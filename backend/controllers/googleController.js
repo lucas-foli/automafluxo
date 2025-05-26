@@ -92,6 +92,9 @@ export const getGoogleToken = async (req, res) => {
   const expiration = user.expiresIn; // salvar isso ao obter token
   const isValid = expiration && now < expiration - 60000;
 
+  console.log('expiration', expiration);
+  console.log('isValid', isValid);
+
   if (isValid) {
     return res.json({ access_token: user.accessToken });
   }
