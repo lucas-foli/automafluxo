@@ -17,7 +17,7 @@ export const exchangeToken = async (req, res) => {
       accessToken: access_token,
       refreshToken: refresh_token,
       expiresIn: {
-        timestamp: expires_in,
+        timestamp: expires_in * 1000,
         dateString: new Date(Date.now() + expires_in * 1000),
       },
     });
