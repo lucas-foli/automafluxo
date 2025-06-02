@@ -88,10 +88,10 @@ export const validateToken = async (req, res) => {
 
   console.log("User found:", user);
   
-  const now = Date.now();
+  const now = new Date();
   console.log("Current time:", now);
   // dando erro pq sempre dá true
-  const expiration = Date(user.expiresIn.dateString); // salvar isso ao obter token
+  const expiration = new Date(user.expiresIn.dateString); // salvar isso ao obter token
   const isValid = now < expiration;
 
   console.log("expiration", expiration);

@@ -40,11 +40,6 @@ const checkOutboundIpChange = async (currentIp) => {
       await IpLog.create({ ip: currentIp });
 
       console.log(`🟡 IP externo alterado: ${currentIp}`);
-      await axios.post(
-        WEBHOOK_NOTIFY_URL,
-        { newIp: currentIp },
-        { validateStatus: false }
-      );
     } else {
       console.log(`✅ IP externo inalterado: ${currentIp}`);
     }
@@ -64,13 +59,13 @@ const checkOutboundIpChange = async (currentIp) => {
 const currentIp = await checksIp();
 const IP_CHECK_INTERVAL = 1000 * 60 * 5; // 5 minutos
 setInterval(checkOutboundIpChange, IP_CHECK_INTERVAL);
-await checkOutboundIpChange(currentIp);
 
 mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => console.log("✅ Connected to MongoDB with Mongoose"))
-  .catch((err) => console.error("❌ Mongoose connection error:", err));
+.connect(process.env.MONGODB_URI)
+.then(() => console.log("✅ Connected to MongoDB with Mongoose"))
+.catch((err) => console.error("❌ Mongoose connection error:", err));
 
+await checkOutboundIpChange(currentIp);
 // Configuração do Express
 const app = express();
 app.set("trust proxy", true);
