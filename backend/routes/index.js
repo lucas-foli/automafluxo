@@ -23,7 +23,7 @@ import {
 } from "../controllers/fbController.js";
 import {
   exchangeToken,
-  getGoogleToken,
+  validateToken,
 } from "../controllers/googleController.js";
 
 const router = express.Router();
@@ -46,7 +46,7 @@ router.post("/instagram/reply-comment", replyToComment);
 router.get("/facebook/login", initiateFbLogin);
 router.get("/facebook/callback", getFbAccessToken);
 router.get("/google/auth", exchangeToken);
-router.get("/google/token", getGoogleToken);
+router.get("/google/token", validateToken);
 // router.get("/whatsapp/fetch", fetchWppMessages);
 
 export default router;

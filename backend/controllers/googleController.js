@@ -12,7 +12,7 @@ export const exchangeToken = async (req, res) => {
     const { access_token, refresh_token, expires_in } =
       await exchangeCodeForTokens(code, redirectUri);
 
-    await saveGoogleUser({
+    const user = await saveGoogleUser({
       whatsapp,
       accessToken: access_token,
       refreshToken: refresh_token,
@@ -22,6 +22,7 @@ export const exchangeToken = async (req, res) => {
       },
     });
 
+    sendToN8n(user);
     res.send(
       "✅ Autenticação concluída com sucesso. Você pode fechar essa aba."
     );
@@ -78,7 +79,7 @@ export const refreshAccessToken = async (refreshToken) => {
   }
 };
 
-export const getGoogleToken = async (req, res) => {
+export const validateToken = async (req, res) => {
   const { whatsapp } = req.query;
   const user = await GoogleUser.findOne({ whatsapp });
 
@@ -92,10 +93,11 @@ export const getGoogleToken = async (req, res) => {
   const expiration = user.expiresIn.timestamp; // salvar isso ao obter token
   const isValid = now < Date.now().valueOf() + expiration;
 
-  console.log('expiration', expiration);
-  console.log('isValid', isValid);
+  console.log("expiration", expiration);
+  console.log("isValid", isValid);
 
   if (isValid) {
+    sendToN8n(user)
     return res.json({ access_token: user.accessToken });
   }
 
@@ -109,8 +111,40 @@ export const getGoogleToken = async (req, res) => {
       expiresIn: now + refreshed.expires_in * 1000,
     });
 
+    sendToN8n(user)
+
     return res.json({ access_token: refreshed.access_token });
   } catch (error) {
     return res.status(500).json({ error: "Erro ao renovar token" });
+  }
+};
+
+export const sendToN8n = async (user) => {
+  if (!user) {
+    return res.status(404).json({ error: "Usuário não encontrado" });
+  }
+  console.log("User found:", user);
+  try {
+    const webhookRequest = await axios.post(
+      `https://primary-g05y-production.up.railway.app/webhook/78301841-7b62-4de3-9f6f-42043bcdd7c3`,
+      {
+        access_token: user.accessToken,
+        whatsapp: user.whatsapp,
+        message: "Teste de mensagem via webhook do Google",
+        refresh_token: user.refreshToken,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Webhook request:", webhookRequest.data);
+  } catch (error) {
+    handleAxiosError(error);
+    return res
+      .status(500)
+      .json({ error: "Erro ao enviar mensagem via webhook" });
   }
 };
