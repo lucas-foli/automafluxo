@@ -87,9 +87,11 @@ export const validateToken = async (req, res) => {
   }
 
   console.log("User found:", user);
-
+  
   const now = Date.now().valueOf();
+  console.log("Current time:", now);
   const expiration = user.expiresIn.timestamp; // salvar isso ao obter token
+  console.log("Expiration:", expiration);
   const isValid = now < Date.now().valueOf() + expiration;
 
   console.log("expiration", expiration);
