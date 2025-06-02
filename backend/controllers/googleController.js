@@ -22,7 +22,6 @@ export const exchangeToken = async (req, res) => {
       },
     });
 
-    sendToN8n(user);
     res.send(
       "✅ Autenticação concluída com sucesso. Você pode fechar essa aba."
     );
@@ -111,40 +110,9 @@ export const validateToken = async (req, res) => {
       expiresIn: now + refreshed.expires_in * 1000,
     });
 
-    sendToN8n(user)
 
     return res.json({ access_token: refreshed.access_token });
   } catch (error) {
     return res.status(500).json({ error: "Erro ao renovar token" });
-  }
-};
-
-export const sendToN8n = async (user) => {
-  if (!user) {
-    return res.status(404).json({ error: "Usuário não encontrado" });
-  }
-  console.log("User found:", user);
-  try {
-    const webhookRequest = await axios.post(
-      `https://primary-g05y-production.up.railway.app/webhook/get-google-user`,
-      {
-        access_token: user.accessToken,
-        whatsapp: user.whatsapp,
-        message: "Teste de mensagem via webhook do Google",
-        refresh_token: user.refreshToken,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("Webhook request:", webhookRequest.data);
-  } catch (error) {
-    handleAxiosError(error);
-    return res
-      .status(500)
-      .json({ error: "Erro ao enviar mensagem via webhook" });
   }
 };
