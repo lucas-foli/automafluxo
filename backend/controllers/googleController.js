@@ -105,12 +105,15 @@ export const validateToken = async (req, res) => {
     const refreshed = await refreshAccessToken(user.refreshToken);
     console.log("Refreshed token:", refreshed);
 
-    await saveGoogleUser({
+    const user = await saveGoogleUser({
       whatsapp,
       accessToken: refreshed.access_token,
-      expiresIn: now + refreshed.expires_in * 1000,
+      expiresIn: {
+        timestamp: refreshed.expires_in,
+        dateString: new Date(Date.now() + refreshed.expires_in * 1000),
+      },
     });
-
+    console.log("User after refresh:", user);
 
     return res.json({ access_token: refreshed.access_token });
   } catch (error) {
