@@ -96,7 +96,6 @@ export const validateToken = async (req, res) => {
   console.log("isValid", isValid);
 
   if (isValid) {
-    sendToN8n(user)
     return res.json({ access_token: user.accessToken });
   }
 
