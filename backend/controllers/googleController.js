@@ -126,7 +126,7 @@ export const sendToN8n = async (user) => {
   console.log("User found:", user);
   try {
     const webhookRequest = await axios.post(
-      `https://primary-g05y-production.up.railway.app/webhook/78301841-7b62-4de3-9f6f-42043bcdd7c3`,
+      `https://primary-g05y-production.up.railway.app/webhook/get-google-user`,
       {
         access_token: user.accessToken,
         whatsapp: user.whatsapp,
