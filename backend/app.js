@@ -61,6 +61,7 @@ const checkOutboundIpChange = async (currentIp) => {
   }
 };
 
+const currentIp = await checksIp();
 const IP_CHECK_INTERVAL = 1000 * 60 * 5; // 5 minutos
 setInterval(checkOutboundIpChange, IP_CHECK_INTERVAL);
 await checkOutboundIpChange(currentIp);
