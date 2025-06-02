@@ -11,6 +11,59 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
+import axios from "axios";
+
+const IpLog = mongoose.model(
+  "IpLog",
+  new mongoose.Schema({
+    ip: String,
+    updatedAt: { type: Date, default: Date.now },
+  })
+);
+
+const checksIp = async () => {
+  try {
+    const response = await axios.get("https://api.ipify.org?format=json");
+    const currentIp = response.data.ip;
+    console.log(`🟡 IP externo: ${currentIp}`);
+    return currentIp;
+  } catch (error) {
+    console.error("Erro ao verificar IP externo:", error.message);
+  }
+};
+
+const checkOutboundIpChange = async (currentIp) => {
+  try {
+    let lastIpDoc = await IpLog.findOne().sort({ updatedAt: -1 }).exec();
+
+    if (!lastIpDoc || lastIpDoc.ip !== currentIp) {
+      await IpLog.create({ ip: currentIp });
+
+      console.log(`🟡 IP externo alterado: ${currentIp}`);
+      await axios.post(
+        WEBHOOK_NOTIFY_URL,
+        { newIp: currentIp },
+        { validateStatus: false }
+      );
+    } else {
+      console.log(`✅ IP externo inalterado: ${currentIp}`);
+    }
+  } catch (error) {
+    if (error.response) {
+      console.error(
+        "Erro ao verificar IP no Mongo:",
+        error.response.status,
+        error.response.data
+      );
+    } else {
+      console.error("Erro ao verificar IP no Mongo:", error.message);
+    }
+  }
+};
+
+const IP_CHECK_INTERVAL = 1000 * 60 * 5; // 5 minutos
+setInterval(checkOutboundIpChange, IP_CHECK_INTERVAL);
+await checkOutboundIpChange(currentIp);
 
 mongoose
   .connect(process.env.MONGODB_URI)
@@ -67,7 +120,7 @@ app.use("/", express.static("docs"));
 // Monta as rotas da API
 app.use("/api", apiRoutes);
 
-app.use((req, res, next) => { 
+app.use((req, res, next) => {
   const isRoot = req.hostnwame === "automafluxo.com.br";
   const isApi = req.originalUrl.startsWith("/api");
   const isStatic = req.originalUrl.startsWith("/assets");
