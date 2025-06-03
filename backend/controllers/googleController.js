@@ -55,6 +55,7 @@ export const exchangeCodeForTokens = async (code, redirectUri) => {
 };
 
 export const refreshAccessToken = async (refreshToken) => {
+  console.log("into refreshAccessToken");
   try {
     const response = await axios.post(
       "https://oauth2.googleapis.com/token",
@@ -74,7 +75,6 @@ export const refreshAccessToken = async (refreshToken) => {
     return response.data; // contém: access_token, expires_in, scope, token_type
   } catch (error) {
     handleAxiosError(error);
-    throw new Error("Erro ao renovar access_token via refresh_token");
   }
 };
 
@@ -87,7 +87,7 @@ export const validateToken = async (req, res) => {
   }
 
   console.log("User found:", user);
-  
+
   const now = new Date();
   console.log("Current time:", now);
   // dando erro pq sempre dá true
@@ -97,26 +97,34 @@ export const validateToken = async (req, res) => {
   console.log("expiration", expiration);
   console.log("isValid", isValid);
 
-  if (isValid) {
-    return res.json({ access_token: user.accessToken });
-  }
-
   try {
+    if (isValid) {
+      return res.json({ access_token: user.accessToken });
+    }
+
+    if (!user.refreshToken) {
+      console.error("Refresh token ausente para o usuário:", user.whatsapp);
+      return res
+        .status(400)
+        .json({ error: "Usuário não possui refresh_token" });
+    }
     const refreshed = await refreshAccessToken(user.refreshToken);
     console.log("Refreshed token:", refreshed);
 
-    const user = await saveGoogleUser({
+    const updatedUser = await saveGoogleUser({
       whatsapp,
+      refreshToken: user.refreshToken,
       accessToken: refreshed.access_token,
       expiresIn: {
         timestamp: refreshed.expires_in,
         dateString: new Date(Date.now() + refreshed.expires_in * 1000),
       },
     });
-    console.log("User after refresh:", user);
+    console.log("User after refresh:", updatedUser);
 
     return res.json({ access_token: refreshed.access_token });
   } catch (error) {
+    handleAxiosError(error);
     return res.status(500).json({ error: "Erro ao renovar token" });
   }
 };

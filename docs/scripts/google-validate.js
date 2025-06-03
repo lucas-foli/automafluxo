@@ -14,9 +14,10 @@
   // };
 
 
+
   try {
     const response = await fetch(
-      `https://api.automafluxo.com.br/api/google/token?whatsapp=${whatsapp}`
+      `http://localhost:3000/api/google/token?whatsapp=${whatsapp}`
     );
 
     if (!response.ok) {

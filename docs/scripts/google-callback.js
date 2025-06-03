@@ -1,11 +1,9 @@
 (async () => {
   const connectionResult = document.getElementById("connection-result");
-  const connectionHeader = document.getElementById("connection-header");
   const loginButton = document.getElementById("login");
   const params = new URLSearchParams(window.location.search);
   const state = params.get("state");
   const code = params.get("code");
-  const isLocal = params.get("local");
 
   // const loginHandler = () => {
   //   loginButton.addEventListener(
