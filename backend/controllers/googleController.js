@@ -34,7 +34,7 @@ export const exchangeToken = async (req, res) => {
   }
 };
 
-export const exchangeCodeForTokens = async (code, redirectUri) => {
+export const  exchangeCodeForTokens = async (code, redirectUri) => {
   const response = await axios.post(
     "https://oauth2.googleapis.com/token",
     qs.stringify({

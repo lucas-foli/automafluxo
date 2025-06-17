@@ -39,7 +39,7 @@ export const saveGoogleUser = async ({
     let user = await GoogleUser.findOne({ whatsapp });
 
     if (!user) {
-      user = new GoogleUser({ whatsapp, accessToken, createdAt, expiresIn });
+      user = new GoogleUser({ whatsapp, accessToken, refreshToken, createdAt, expiresIn });
       await user.save();
       console.log("Usuário criado com sucesso:");
     } else {
