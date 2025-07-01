@@ -45,7 +45,7 @@
     Autenticado! Redirecionando ao WhatsApp...
   </p>`;
 
-    setTimeout(() => (window.location.href = "https://api.whatsapp.com/send?phone=551152862523&text=Conectado%20no%20Google%20"), 3000);
+    setTimeout(() => (window.location.href = "https://api.whatsapp.com/send?phone=556193116103&text=Conectado%20no%20Google%20"), 3000);
   } catch (error) {
     connectionResult.textContent = "Something went wrong: " + error.message;
     loginButton.hidden = false;
