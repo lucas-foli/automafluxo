@@ -26,7 +26,7 @@
 
   try {
     const response = await fetch(
-      `https://api.automafluxo.com.br/api/google/auth?code=${code}&state=${state}`
+      `/api/google/auth?code=${code}&state=${state}`
     );
 
     if (!response.ok) {

@@ -168,6 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   fbLoginButton.addEventListener(
     "click",
-    () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/facebook/login' : 'https://api.automafluxo.com.br/api/facebook/login')
+    () => (window.location.href = '/api/facebook/login')
   );
 });

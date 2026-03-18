@@ -56,16 +56,19 @@ const checkOutboundIpChange = async (currentIp) => {
   }
 };
 
-const currentIp = await checksIp();
-const IP_CHECK_INTERVAL = 1000 * 60 * 5; // 5 minutos
-setInterval(checkOutboundIpChange, IP_CHECK_INTERVAL);
-
 mongoose
 .connect(process.env.MONGODB_URI)
 .then(() => console.log("✅ Connected to MongoDB with Mongoose"))
 .catch((err) => console.error("❌ Mongoose connection error:", err));
 
-await checkOutboundIpChange(currentIp);
+// IP monitoring only runs outside Vercel (needs persistent process)
+if (!process.env.VERCEL) {
+  const currentIp = await checksIp();
+  const IP_CHECK_INTERVAL = 1000 * 60 * 5; // 5 minutos
+  setInterval(checkOutboundIpChange, IP_CHECK_INTERVAL);
+  await checkOutboundIpChange(currentIp);
+}
+
 // Configuração do Express
 const app = express();
 app.set("trust proxy", true);
@@ -74,11 +77,10 @@ const corsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
       "http://localhost:3000",
-      "https://www.automafluxo.com.br",
+      "https://automafluxo.vercel.app",
     ];
 
     if (!origin) {
-      // ⚠️ Permite requisições sem Origin (como curl, Postman)
       return callback(null, true);
     }
 
@@ -116,23 +118,12 @@ app.use("/", express.static("docs"));
 // Monta as rotas da API
 app.use("/api", apiRoutes);
 
-app.use((req, res, next) => {
-  const isRoot = req.hostnwame === "automafluxo.com.br";
-  const isApi = req.originalUrl.startsWith("/api");
-  const isStatic = req.originalUrl.startsWith("/assets");
-
-  // Se for uma requisição para o domínio raiz que não seja API nem arquivo estático, redireciona para o frontend
-  if (isRoot && !isApi && !isStatic) {
-    return res.redirect(
-      301,
-      `https://www.automafluxo.com.br${req.originalUrl}`
-    );
-  }
-
-  next(); // Continua normalmente para os próximos middlewares ou rotas
-});
-
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+  });
+}
+
+export default app;

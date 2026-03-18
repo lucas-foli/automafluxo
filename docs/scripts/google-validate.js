@@ -17,7 +17,7 @@
 
   try {
     const response = await fetch(
-      `http://localhost:3000/api/google/token?whatsapp=${whatsapp}`
+      `/api/google/token?whatsapp=${whatsapp}`
     );
 
     if (!response.ok) {

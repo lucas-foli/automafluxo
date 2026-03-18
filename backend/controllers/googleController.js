@@ -6,7 +6,7 @@ import GoogleUser from "../models/GoogleUser.js";
 
 export const exchangeToken = async (req, res) => {
   const { code, state: whatsapp } = req.query;
-  const redirectUri = "https://automafluxo.com.br/pages/google-callback.html";
+  const redirectUri = "https://automafluxo.vercel.app/pages/google-callback.html";
 
   try {
     const { access_token, refresh_token, expires_in } =

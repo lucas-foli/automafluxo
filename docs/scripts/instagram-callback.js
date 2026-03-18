@@ -9,9 +9,7 @@
     loginButton.addEventListener(
       "click",
       () =>
-        (window.location.href = window.location.hostname.includes("localhost")
-          ? "http://localhost:3000/api/instagram/initiate"
-          : "https://api.automafluxo.com.br/api/instagram/initiate")
+        (window.location.href = "/api/instagram/initiate")
     );
   };
 
@@ -30,7 +28,7 @@
 
   try {
     const response = await fetch(
-      `https://api.automafluxo.com.br/api/instagram/callback?code=${code}`
+      `/api/instagram/callback?code=${code}`
     );
 
     if (!response.ok) {

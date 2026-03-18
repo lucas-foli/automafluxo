@@ -11,7 +11,7 @@
   }
 
   try {
-    const response = await fetch(`https://api.automafluxo.com.br/api/facebook/callback?code=${code}`);
+    const response = await fetch(`/api/facebook/callback?code=${code}`);
 
     if (!response.ok) {
       const error = await response.json();
@@ -20,7 +20,7 @@
       loginButton.hidden = false;
       loginButton.addEventListener(
         "click",
-        () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/facebook/login' : 'https://api.automafluxo.com.br/api/facebook/login')
+        () => (window.location.href = '/api/facebook/login')
       );
 
       return;
@@ -36,7 +36,7 @@
     loginButton.hidden = false;
     loginButton.addEventListener(
       "click",
-      () => (window.location.href = window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/facebook/login' : 'https://api.automafluxo.com.br/api/facebook/login')
+      () => (window.location.href = '/api/facebook/login')
     );
   }
 })();

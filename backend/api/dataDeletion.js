@@ -62,7 +62,7 @@ app.post('/data-deletion-callback', (req, res) => {
     deleteUserData(fbUserId)
     .then(() => {
       const confirmationCode = generateConfirmationCode(fbUserId); // Gere um código único, por exemplo
-      const statusUrl = 'https://www.automafluxo.com.br/deletion?id=' + confirmationCode;
+      const statusUrl = 'https://automafluxo.vercel.app/deletion?id=' + confirmationCode;
       return res.json({
         url: statusUrl,
         confirmation_code: confirmationCode
